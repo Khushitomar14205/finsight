@@ -1,0 +1,181 @@
+{
+ "generated_for_latest_date": "2026-10-06",
+ "pulse": {
+  "date": "2026-10-06",
+  "advancers": 2403,
+  "decliners": 1196,
+  "unchanged": 101,
+  "traded": 3700,
+  "median_change_pct": 0.006408063711067613,
+  "total_turnover": 1097479839048.66,
+  "gainers": [
+   {
+    "symbol": "PARTY-RE",
+    "close": 0.3,
+    "change_pct": 0.19999999999999996,
+    "volume": 392258.0
+   },
+   {
+    "symbol": "MOBIKWIK",
+    "close": 242.14,
+    "change_pct": 0.19996035482432228,
+    "volume": 58640687.0
+   },
+   {
+    "symbol": "SHANTIINOR",
+    "close": 201.65,
+    "change_pct": 0.19994049390062485,
+    "volume": 824000.0
+   },
+   {
+    "symbol": "SURANI",
+    "close": 144.05,
+    "change_pct": 0.1999167013744274,
+    "volume": 69400.0
+   },
+   {
+    "symbol": "MANIKA",
+    "close": 51.52,
+    "change_pct": 0.19508234748318265,
+    "volume": 8545846.0
+   },
+   {
+    "symbol": "SRIT",
+    "close": 155.09,
+    "change_pct": 0.19300000000000006,
+    "volume": 5130949.0
+   },
+   {
+    "symbol": "NAMOEWASTE",
+    "close": 382.9,
+    "change_pct": 0.18361669242658407,
+    "volume": 148000.0
+   },
+   {
+    "symbol": "TAALTECH",
+    "close": 1093.4,
+    "change_pct": 0.17607830482951492,
+    "volume": 622209.0
+   },
+   {
+    "symbol": "BALAMINES",
+    "close": 2287.7,
+    "change_pct": 0.1685054653182143,
+    "volume": 2585710.0
+   },
+   {
+    "symbol": "AMNPLST",
+    "close": 186.92,
+    "change_pct": 0.16613637781520985,
+    "volume": 431098.0
+   }
+  ],
+  "losers": [
+   {
+    "symbol": "VERANDA",
+    "close": 29.72,
+    "change_pct": -0.8603120887384846,
+    "volume": 418116.0
+   },
+   {
+    "symbol": "BLSE",
+    "close": 160.9,
+    "change_pct": -0.4958483471721761,
+    "volume": 285538.0
+   },
+   {
+    "symbol": "1015SCL29B",
+    "close": 891.0,
+    "change_pct": -0.19394235466536403,
+    "volume": 7.0
+   },
+   {
+    "symbol": "737NTPC35C",
+    "close": 1149.0,
+    "change_pct": -0.15265486725663713,
+    "volume": 61.0
+   },
+   {
+    "symbol": "CENTEXT-RE",
+    "close": 2.4,
+    "change_pct": -0.13978494623655924,
+    "volume": 66287.0
+   },
+   {
+    "symbol": "PSFL",
+    "close": 32.5,
+    "change_pct": -0.1095890410958904,
+    "volume": 2000.0
+   },
+   {
+    "symbol": "MDL",
+    "close": 58.35,
+    "change_pct": -0.10092449922958402,
+    "volume": 7000.0
+   },
+   {
+    "symbol": "ISHAN",
+    "close": 0.45,
+    "change_pct": -0.09999999999999998,
+    "volume": 192000.0
+   },
+   {
+    "symbol": "VINOD",
+    "close": 41.25,
+    "change_pct": -0.09934497816593879,
+    "volume": 928800.0
+   },
+   {
+    "symbol": "LANDSMILL",
+    "close": 0.93,
+    "change_pct": -0.09708737864077666,
+    "volume": 11262310.0
+   }
+  ]
+ },
+ "yearly": [
+  {
+   "year": 2020,
+   "records": 457323,
+   "symbols": 2198
+  },
+  {
+   "year": 2021,
+   "records": 480999,
+   "symbols": 2387
+  },
+  {
+   "year": 2022,
+   "records": 524968,
+   "symbols": 2621
+  },
+  {
+   "year": 2023,
+   "records": 570712,
+   "symbols": 3141
+  },
+  {
+   "year": 2024,
+   "records": 673350,
+   "symbols": 4139
+  },
+  {
+   "year": 2025,
+   "records": 759454,
+   "symbols": 4538
+  },
+  {
+   "year": 2026,
+   "records": 639520,
+   "symbols": 5110
+  }
+ ],
+ "quality": {
+  "duplicates": 0,
+  "ohlc_violations": 0,
+  "nonpositive_prices": 0,
+  "negative_volume": 0,
+  "extreme_moves": 797,
+  "missing_sessions": 93
+ }
+}
