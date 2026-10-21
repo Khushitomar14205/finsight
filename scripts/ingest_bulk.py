@@ -29,6 +29,12 @@ def main():
                                       progress=lambda m: print(m, flush=True))
     print("FINAL SUMMARY:", summary, flush=True)
     print("COVERAGE:", store.coverage(), flush=True)
+    try:
+        from src.reporting.overview_stats import build_overview_stats
+        build_overview_stats(store)
+        print("overview_stats.json refreshed", flush=True)
+    except Exception as exc:
+        print("overview stats refresh failed (non-fatal):", exc, flush=True)
 
 if __name__ == "__main__":
     main()

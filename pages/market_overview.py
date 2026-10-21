@@ -6,6 +6,7 @@ from pages.common import get_context, demo_banner, require_data, load_all_cached
 from src.analytics import returns as R
 from src.data_processing.validation import validate_dataframe
 from src.data_ingestion.downloader import BhavcopyDownloader
+from src.reporting.overview_stats import read_overview_stats
 
 settings, store = get_context()
 
@@ -37,24 +38,44 @@ for col, (label, value, sub) in zip(kpis, cards):
             st.metric(label, value)
             st.caption(sub)
 
-df = load_all_cached(str(store.processed_dir), str(store.metadata_dir))
+# ---------- Numbers: precomputed stats if available, else compute live ----------
+stats = read_overview_stats(settings.metadata_dir)
+if stats and stats.get("generated_for_latest_date") == cov.get("latest_available_date"):
+    pulse = stats["pulse"]
+    yearly = pd.DataFrame(stats["yearly"])
+    quality = stats["quality"]
+else:
+    # Fallback (fresh local data without precomputed stats): compute live.
+    df = load_all_cached(str(store.processed_dir), str(store.metadata_dir))
+    latest_date = df["date"].max()
+    day = df[df["date"] == latest_date].dropna(subset=["prev_close", "close"]).copy()
+    day = day[day["prev_close"] > 0]
+    day["change_pct"] = day["close"] / day["prev_close"] - 1
+    movers = R.gainers_losers(day, 10)
+    pulse = {"date": str(latest_date.date()),
+             "advancers": int((day["change_pct"] > 0).sum()),
+             "decliners": int((day["change_pct"] < 0).sum()),
+             "unchanged": int((day["change_pct"] == 0).sum()),
+             "traded": int(len(day)),
+             "median_change_pct": float(day["change_pct"].median()),
+             "total_turnover": float(day["turnover"].sum()),
+             "gainers": movers["gainers"], "losers": movers["losers"]}
+    yearly = (df.assign(year=df["date"].dt.year).groupby("year")
+                .agg(records=("close", "size"), symbols=("symbol", "nunique")).reset_index())
+    rep = validate_dataframe(df)
+    quality = {"duplicates": rep.duplicate_symbol_date, "ohlc_violations": rep.ohlc_violations,
+               "nonpositive_prices": rep.nonpositive_prices, "negative_volume": rep.negative_volume,
+               "extreme_moves": rep.extreme_daily_moves, "missing_sessions": rep.missing_weekday_sessions}
 
-# ---------- Market pulse: latest trading day ----------
-latest_date = df["date"].max()
-day = df[df["date"] == latest_date].dropna(subset=["prev_close", "close"]).copy()
-day = day[day["prev_close"] > 0]
-day["change_pct"] = day["close"] / day["prev_close"] - 1
-adv = int((day["change_pct"] > 0).sum())
-dec = int((day["change_pct"] < 0).sum())
-unch = int((day["change_pct"] == 0).sum())
-
+# ---------- Market pulse ----------
+adv, dec, unch = pulse["advancers"], pulse["decliners"], pulse["unchanged"]
 with st.container(border=True):
-    st.subheader(f"🫀 Market pulse — {latest_date.date()} (latest available day)")
+    st.subheader(f"🫀 Market pulse — {pulse['date']} (latest available day)")
     p1, p2, p3, p4 = st.columns(4)
-    p1.metric("Advancers", f"{adv:,}", delta=f"{adv / max(len(day),1):.0%} of traded symbols")
-    p2.metric("Decliners", f"{dec:,}", delta=f"{dec / max(len(day),1):.0%} of traded symbols", delta_color="inverse")
-    p3.metric("Median change", f"{day['change_pct'].median():.2%}")
-    p4.metric("Total turnover", f"₹{day['turnover'].sum() / 1e7:,.0f} Cr")
+    p1.metric("Advancers", f"{adv:,}", delta=f"{adv / max(pulse['traded'],1):.0%} of traded symbols")
+    p2.metric("Decliners", f"{dec:,}", delta=f"{dec / max(pulse['traded'],1):.0%} of traded symbols", delta_color="inverse")
+    p3.metric("Median change", f"{pulse['median_change_pct']:.2%}")
+    p4.metric("Total turnover", f"₹{pulse['total_turnover'] / 1e7:,.0f} Cr")
     breadth = go.Figure()
     breadth.add_trace(go.Bar(y=["Market breadth"], x=[adv], orientation="h", name="Advancers",
                              marker_color="#2ca02c", text=[f"{adv:,} up"], textposition="inside"))
@@ -66,9 +87,8 @@ with st.container(border=True):
                           legend=dict(orientation="h", y=-0.35), xaxis_title="")
     st.plotly_chart(breadth, use_container_width=True)
 
-    movers = R.gainers_losers(day, 10)
-    if movers["gainers"] and movers["losers"]:
-        top_g, top_l = movers["gainers"][0], movers["losers"][0]
+    if pulse["gainers"] and pulse["losers"]:
+        top_g, top_l = pulse["gainers"][0], pulse["losers"][0]
         g1, g2 = st.columns(2)
         with g1:
             with st.container(border=True):
@@ -83,20 +103,16 @@ with st.container(border=True):
     t1, t2 = st.columns(2)
     with t1:
         st.markdown("**Top 10 gainers**")
-        st.dataframe(movers["gainers"], use_container_width=True, hide_index=True)
+        st.dataframe(pulse["gainers"], use_container_width=True, hide_index=True)
     with t2:
         st.markdown("**Top 10 losers**")
-        st.dataframe(movers["losers"], use_container_width=True, hide_index=True)
+        st.dataframe(pulse["losers"], use_container_width=True, hide_index=True)
 
 # ---------- Coverage growth + data quality ----------
 c_left, c_right = st.columns([3, 2])
 with c_left:
     with st.container(border=True):
         st.subheader("📚 Coverage by year")
-        yearly = (df.assign(year=df["date"].dt.year)
-                    .groupby("year")
-                    .agg(records=("close", "size"), symbols=("symbol", "nunique"))
-                    .reset_index())
         fig = px.bar(yearly, x="year", y="records", text="symbols",
                      labels={"records": "Records", "year": "Year"},
                      title="Records per year (labels = distinct symbols that year)")
@@ -106,12 +122,11 @@ with c_left:
 with c_right:
     with st.container(border=True):
         st.subheader("✅ Data quality at a glance")
-        rep = validate_dataframe(df)
-        st.markdown(f"**Duplicates:** {rep.duplicate_symbol_date} · **OHLC violations:** {rep.ohlc_violations}")
-        st.markdown(f"**Non-positive prices:** {rep.nonpositive_prices} · **Negative volume:** {rep.negative_volume}")
-        st.markdown(f"**Extreme moves flagged:** {rep.extreme_daily_moves} "
+        st.markdown(f"**Duplicates:** {quality['duplicates']} · **OHLC violations:** {quality['ohlc_violations']}")
+        st.markdown(f"**Non-positive prices:** {quality['nonpositive_prices']} · **Negative volume:** {quality['negative_volume']}")
+        st.markdown(f"**Extreme moves flagged:** {quality['extreme_moves']} "
                     "(unadjusted prices — splits/bonuses; flagged, never altered)")
-        st.markdown(f"**Weekday sessions with no file:** {rep.missing_weekday_sessions} "
+        st.markdown(f"**Weekday sessions with no file:** {quality['missing_sessions']} "
                     "(market holidays — see the ingestion log)")
         st.page_link("pages/data_quality.py", label="Full quality report & ingestion log →", icon="✅")
     with st.container(border=True):

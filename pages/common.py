@@ -31,10 +31,11 @@ def require_data(store) -> bool:
 def get_portfolio_weights() -> dict:
     return st.session_state.get("portfolio_weights", {})
 
-@st.cache_data(ttl=3600, show_spinner=False)
+@st.cache_resource(show_spinner=False)
 def load_all_cached(processed_dir: str, metadata_dir: str):
-    """Full dataset, cached for an hour — several pages need it and
-    re-reading 4.1M rows on every interaction is wasteful."""
+    """Full dataset as ONE shared in-memory copy across sessions.
+    (cache_resource, not cache_data: cache_data serializes a second copy of
+    a 4.1M-row frame, which can exhaust small cloud containers.)"""
     from src.storage.store import MarketDataStore
     from pathlib import Path
     return MarketDataStore(Path(processed_dir), Path(metadata_dir)).load_all()
