@@ -1,5 +1,8 @@
 # FinSight — AI-Powered NSE Market & Portfolio Research Agent
 
+**Live app:** https://khushitomar14205-finsight-app-f2tuw5.streamlit.app/
+**Dataset:** Real NSE bhavcopy, 2020-01-01 → 2026-10-06 — 4,106,326 rows, 7,085 symbols, 1,672 trading days (included in this repo as partitioned Parquet).
+
 A production-minded financial research application for historical Indian equity data: NSE bhavcopy ingestion, market exploration, stock analytics with technical indicators, portfolio performance/risk/optimization, experimental ML forecasting, and a LangGraph AI research assistant that answers **only** from deterministic Python tool outputs — it never invents numbers.
 
 > Historical closes are not live prices. Nothing here is investment advice, and the app never executes trades.
