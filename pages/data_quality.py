@@ -36,8 +36,10 @@ if st.button("Download & ingest range"):
     with st.spinner("Downloading… (bounded retries, failures are logged)"):
         recs = dl.ingest_range(start, end)
     ok = sum(1 for r in recs if r.status in ("success", "local_success"))
+    holidays = [r for r in recs if r.status == "holiday"]
     failed = [r for r in recs if r.status == "failed"]
-    st.write(f"**{ok}** days ingested · **{len(failed)}** failed · {len(recs) - ok - len(failed)} skipped.")
+    st.write(f"**{ok}** days ingested · **{len(holidays)}** market holidays (no trading session) · "
+             f"**{len(failed)}** failed · {len(recs) - ok - len(holidays) - len(failed)} skipped.")
     for r in failed[:5]:
         st.error(f"{r.date}: {r.detail}")
 
@@ -53,7 +55,10 @@ if up is not None and st.button("Ingest uploaded file"):
         st.error(f"Could not ingest file: {e}")
 
 st.subheader("Ingestion log")
-log = dl.read_log()
+st.caption("Status key: **success** = data downloaded · **holiday** = market holiday, no trading session "
+           "(not an error) · **failed** = genuine download problem, safe to retry · "
+           "**skipped_weekend / skipped_existing** = nothing to do.")
+log = dl.read_log_display()
 if log:
     st.dataframe(pd.DataFrame(log).iloc[::-1], use_container_width=True, height=300)
 else:

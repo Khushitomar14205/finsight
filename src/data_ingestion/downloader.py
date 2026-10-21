@@ -26,6 +26,18 @@ logger = get_logger("finsight.ingestion")
 
 UDIFF_CUTOFF = date(2024, 6, 1)  # NSE publishes UDiFF-format CM bhavcopy from mid-2024
 
+class NoTradingSessionError(Exception):
+    """Raised when NSE published no bhavcopy for a weekday at all (both
+    formats returned HTTP 404) — i.e. a market holiday / non-trading day.
+    This is NOT a download failure and is logged/displayed as 'holiday'."""
+
+def is_holiday_detail(detail: str) -> bool:
+    """True when a failure detail shows 404 from every attempted format."""
+    if not detail:
+        return False
+    parts = [p for p in detail.split("|") if p.strip()]
+    return bool(parts) and all("HTTP 404" in p for p in parts)
+
 class NSESourceAdapter:
     """Builds official NSE archive URLs for a trading date."""
     BASE = "https://nsearchives.nseindia.com"
@@ -43,7 +55,7 @@ class NSESourceAdapter:
 @dataclass
 class IngestionRecord:
     date: str
-    status: str  # success | skipped_weekend | skipped_existing | failed | local_success
+    status: str  # success | holiday | skipped_weekend | skipped_existing | failed | local_success
     source_file: str = ""
     rows: int = 0
     detail: str = ""
@@ -73,6 +85,20 @@ class BhavcopyDownloader:
             return []
         return [json.loads(l) for l in self.log_file.read_text().splitlines() if l.strip()]
 
+    def read_log_display(self) -> list[dict]:
+        """Log entries for display: 'failed' entries that are actually
+        market holidays (404 from every format) are shown as 'holiday'.
+        This also corrects entries written before holiday classification
+        existed."""
+        out = []
+        for entry in self.read_log():
+            e = dict(entry)
+            if e.get("status") == "failed" and is_holiday_detail(e.get("detail", "")):
+                e["status"] = "holiday"
+                e["display_note"] = "Market holiday — no trading session, no bhavcopy published."
+            out.append(e)
+        return out
+
     def _fetch(self, url: str) -> bytes:
         last_exc: Exception | None = None
         for attempt in range(1, self.settings.max_retries + 1):
@@ -95,6 +121,28 @@ class BhavcopyDownloader:
         if not force and ds in self.store.processed_dates():
             rec = IngestionRecord(ds, "skipped_existing")
             self._log(rec); return rec
+        try:
+            df, fmt = self._download_day(d)
+            self.store.save(df)
+            rec = IngestionRecord(ds, "success", source_file=str(df["source_file"].iloc[0]),
+                                  rows=int(len(df)), detail=f"format={fmt}")
+            self._log(rec); return rec
+        except NoTradingSessionError as e:
+            rec = IngestionRecord(ds, "holiday", detail=str(e)[:500])
+            self._log(rec); return rec
+        except Exception as e:
+            rec = IngestionRecord(ds, "failed", detail=str(e)[:500])
+            self._log(rec); return rec
+
+    def ingest_range(self, start: date, end: date, force: bool = False) -> list[IngestionRecord]:
+        records, d = [], start
+        while d <= end:
+            records.append(self.ingest_date(d, force=force))
+            d += timedelta(days=1)
+        return records
+
+    def _download_day(self, d: date) -> tuple[object, str]:
+        """Download + normalize one day. Returns (DataFrame, format) or raises."""
         errors = []
         for fmt, url in self.adapter.urls_for(d):
             try:
@@ -103,21 +151,61 @@ class BhavcopyDownloader:
                 df = normalize(raw, source_file=url.split("/")[-1])
                 if df.empty:
                     errors.append(f"{fmt}: parsed 0 rows"); continue
-                self.store.save(df)
-                rec = IngestionRecord(ds, "success", source_file=url.split("/")[-1],
-                                      rows=int(len(df)), detail=f"format={fmt}")
-                self._log(rec); return rec
+                return df, fmt
             except Exception as e:
                 errors.append(f"{fmt}: {e}")
-        rec = IngestionRecord(ds, "failed", detail=" | ".join(errors)[:500])
-        self._log(rec); return rec
+        detail = " | ".join(errors)[:500]
+        if is_holiday_detail(detail):
+            raise NoTradingSessionError(detail)
+        raise RuntimeError(detail)
 
-    def ingest_range(self, start: date, end: date, force: bool = False) -> list[IngestionRecord]:
-        records, d = [], start
-        while d <= end:
-            records.append(self.ingest_date(d, force=force))
-            d += timedelta(days=1)
-        return records
+    def ingest_range_batched(self, start: date, end: date, force: bool = False,
+                             progress=None) -> dict:
+        """Efficient bulk ingestion: downloads day by day but writes to the
+        Parquet store once per calendar month (the per-day path rewrites the
+        whole store every day, which is quadratic over long ranges).
+        Resumable: already-processed dates are skipped, failures are logged
+        per day and can be retried by re-running the same range."""
+        import pandas as pd
+        existing = set() if force else self.store.processed_dates()
+        summary = {"success": 0, "failed": 0, "holiday": 0, "skipped_weekend": 0, "skipped_existing": 0, "rows": 0}
+        month_start = date(start.year, start.month, 1)
+        while month_start <= end:
+            if month_start.month == 12:
+                next_month = date(month_start.year + 1, 1, 1)
+            else:
+                next_month = date(month_start.year, month_start.month + 1, 1)
+            frames, d = [], max(month_start, start)
+            month_end = min(next_month - timedelta(days=1), end)
+            while d <= month_end:
+                ds = d.isoformat()
+                if d.weekday() >= 5:
+                    summary["skipped_weekend"] += 1
+                    self._log(IngestionRecord(ds, "skipped_weekend"))
+                elif ds in existing:
+                    summary["skipped_existing"] += 1
+                    self._log(IngestionRecord(ds, "skipped_existing"))
+                else:
+                    try:
+                        df, fmt = self._download_day(d)
+                        frames.append(df)
+                        existing.add(ds)
+                        summary["success"] += 1; summary["rows"] += int(len(df))
+                        self._log(IngestionRecord(ds, "success", source_file=str(df["source_file"].iloc[0]),
+                                                  rows=int(len(df)), detail=f"format={fmt} batched"))
+                    except NoTradingSessionError as e:
+                        summary["holiday"] += 1
+                        self._log(IngestionRecord(ds, "holiday", detail=str(e)[:500]))
+                    except Exception as e:
+                        summary["failed"] += 1
+                        self._log(IngestionRecord(ds, "failed", detail=str(e)[:500]))
+                d += timedelta(days=1)
+            if frames:
+                self.store.save(pd.concat(frames, ignore_index=True))
+            if progress:
+                progress(f"{month_start.strftime('%Y-%m')}: cumulative {summary}")
+            month_start = next_month
+        return summary
 
     def ingest_local_file(self, path) -> IngestionRecord:
         """Recovery path: ingest an official bhavcopy file the user placed locally."""

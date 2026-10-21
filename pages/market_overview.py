@@ -28,12 +28,13 @@ st.write(f"Duplicates: **{rep.duplicate_symbol_date}** · OHLC violations: **{re
          f"Missing weekday sessions (incl. holidays): **{rep.missing_weekday_sessions}**")
 
 st.subheader("Ingestion status")
-log = BhavcopyDownloader(settings, store).read_log()
+log = BhavcopyDownloader(settings, store).read_log_display()
 if log:
     import pandas as pd
     log_df = pd.DataFrame(log)
     st.write(f"Last status: **{log_df.iloc[-1]['status']}** on {log_df.iloc[-1]['date']} · "
              f"{(log_df['status'] == 'success').sum() + (log_df['status'] == 'local_success').sum()} successful days logged, "
+             f"{(log_df['status'] == 'holiday').sum()} market holidays (no trading session), "
              f"{(log_df['status'] == 'failed').sum()} failed (retryable).")
 else:
     st.write("No ingestion runs logged yet.")

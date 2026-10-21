@@ -28,8 +28,10 @@ def main():
         ap.error("--start and --end are required unless --local is used")
     recs = dl.ingest_range(date.fromisoformat(args.start), date.fromisoformat(args.end), force=args.force)
     ok = sum(1 for r in recs if r.status in ("success", "local_success"))
+    holidays = sum(1 for r in recs if r.status == "holiday")
     failed = [r for r in recs if r.status == "failed"]
-    print(f"Done: {ok} succeeded, {len(failed)} failed, {len(recs)} total days considered.")
+    print(f"Done: {ok} succeeded, {holidays} market holidays (no trading session), "
+          f"{len(failed)} failed, {len(recs)} total days considered.")
     for r in failed[:10]:
         print("FAILED", r.date, r.detail)
 
