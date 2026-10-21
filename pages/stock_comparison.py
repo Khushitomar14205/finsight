@@ -45,8 +45,10 @@ if df.empty:
     st.error("No data found for the selected symbols.")
     st.stop()
 comp = R.compare_symbols(df, picked, settings.risk_free_rate)
-st.caption(f"Common comparison range for the table below: {comp.get('common_start')} → {comp.get('common_end')} · "
-           f"Missing observations per symbol within that range: {comp.get('missing_observations')}")
+_missing = comp.get("missing_observations") or {}
+_missing_txt = " · ".join(f"{k}: {v}" for k, v in _missing.items()) if _missing else "none"
+st.caption(f"Common comparison range for the table below: {fmt_date(comp.get('common_start'))} → "
+           f"{fmt_date(comp.get('common_end'))} · Missing observations within that range — {_missing_txt}")
 
 rows = []
 for sym, s in comp["symbols"].items():
