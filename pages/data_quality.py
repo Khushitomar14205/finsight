@@ -16,12 +16,28 @@ st.write(f"**Stored data:** {cov.get('rows', 0):,} rows · {cov.get('symbols', 0
          f"{cov.get('date_min') or '—'} → {cov.get('date_max') or '—'}")
 
 if cov.get("has_data"):
-    rep = validate_dataframe(store.load_all())
     st.subheader("Data-quality report")
-    st.dataframe(pd.DataFrame([{"check": k, "value": str(v)} for k, v in rep.to_dict().items()]),
-                 use_container_width=True)
-    for issue in rep.issues:
-        st.write(f"- {issue}")
+    from src.reporting.overview_stats import read_overview_stats
+    pre = read_overview_stats(settings.metadata_dir)
+    if pre and pre.get("quality") and not st.session_state.get("dq_live"):
+        q = pre["quality"]
+        rows = [{"check": "duplicate_symbol_date", "value": q["duplicates"]},
+                {"check": "ohlc_violations", "value": q["ohlc_violations"]},
+                {"check": "nonpositive_prices", "value": q["nonpositive_prices"]},
+                {"check": "negative_volume", "value": q["negative_volume"]},
+                {"check": "extreme_daily_moves_flagged", "value": q["extreme_moves"]},
+                {"check": "missing_weekday_sessions", "value": q["missing_sessions"]}]
+        st.dataframe(pd.DataFrame(rows), use_container_width=True)
+        st.caption("Precomputed at ingestion time (validating 4.1M rows live is heavy on small hosts).")
+        if st.button("Re-run full validation now"):
+            st.session_state["dq_live"] = True
+            st.rerun()
+    else:
+        rep = validate_dataframe(store.load_all())
+        st.dataframe(pd.DataFrame([{"check": k, "value": str(v)} for k, v in rep.to_dict().items()]),
+                     use_container_width=True)
+        for issue in rep.issues:
+            st.write(f"- {issue}")
     st.caption("Prices are unadjusted bhavcopy values. Corporate actions can create flagged extreme moves; "
                "missing weekday sessions include market holidays and are not automatically errors.")
 

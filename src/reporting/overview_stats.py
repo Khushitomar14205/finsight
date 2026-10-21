@@ -56,7 +56,32 @@ def build_overview_stats(store) -> dict:
     }
     out = Path(store.metadata_dir) / STATS_FILE
     out.write_text(json.dumps(stats, indent=1))
+    # Per-symbol stats: lets symbol pickers/info captions work WITHOUT loading
+    # the full 642 MB dataset into memory (critical on small cloud hosts).
+    total_days = int(df["date"].nunique())
+    sym_stats = {}
+    grouped = df.groupby("symbol")
+    series_map = df.groupby("symbol")["series"].unique()
+    for sym, g in grouped:
+        sers = sorted(str(s) for s in series_map[sym])
+        sym_stats[str(sym)] = {"rows": int(len(g)),
+                               "start": str(g["date"].min().date()),
+                               "end": str(g["date"].max().date()),
+                               "series": sers, "is_equity": "EQ" in sers}
+    payload = {"total_days": total_days,
+               "trading_dates": [str(d.date()) for d in sorted(df["date"].unique())],
+               "symbols": sym_stats}
+    (Path(store.metadata_dir) / "symbol_stats.json").write_text(json.dumps(payload))
     return stats
+
+def read_symbol_stats(metadata_dir) -> dict | None:
+    path = Path(metadata_dir) / "symbol_stats.json"
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text())
+    except Exception:
+        return None
 
 def read_overview_stats(metadata_dir) -> dict | None:
     path = Path(metadata_dir) / STATS_FILE

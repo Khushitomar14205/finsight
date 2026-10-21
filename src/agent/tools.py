@@ -150,6 +150,12 @@ def what_if_analysis(ctx, new_weights=None, weights=None, **kw):
 
 # 13
 def data_quality_report(ctx, **kw):
+    # Prefer the precomputed quality summary (full validation of 4.1M rows is
+    # heavy); fall back to live validation when no summary exists.
+    from ..reporting.overview_stats import read_overview_stats
+    stats = read_overview_stats(ctx.store.metadata_dir)
+    if stats and stats.get("quality"):
+        return {"source": "precomputed_at_ingestion", **stats["quality"]}
     df = ctx.store.load_all()
     if df.empty: return {"note": "No local data yet — nothing to validate."}
     return validate_dataframe(df).to_dict()

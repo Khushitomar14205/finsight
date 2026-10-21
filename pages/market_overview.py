@@ -133,11 +133,15 @@ with c_right:
         st.subheader("🔄 Ingestion status")
         log = BhavcopyDownloader(settings, store).read_log_display()
         if log:
-            log_df = pd.DataFrame(log)
-            st.markdown(f"**{int((log_df['status'] == 'success').sum() + (log_df['status'] == 'local_success').sum()):,}** "
-                        f"days downloaded · **{int((log_df['status'] == 'holiday').sum())}** market holidays · "
-                        f"**{int((log_df['status'] == 'failed').sum())}** failed (retryable)")
-            st.caption(f"Latest log entry: {log_df.iloc[-1]['date']} — {log_df.iloc[-1]['status']}")
+            # Per-date status (latest attempt per date) — raw entries include retries.
+            by_date = {}
+            for e in log:
+                by_date[e["date"]] = e["status"]
+            counts = pd.Series(list(by_date.values())).value_counts()
+            st.markdown(f"**{int(counts.get('success', 0) + counts.get('local_success', 0)):,}** "
+                        f"days downloaded · **{int(counts.get('holiday', 0))}** market holidays · "
+                        f"**{int(counts.get('failed', 0))}** failed (retryable)")
+            st.caption(f"Latest log entry: {log[-1]['date']} — {log[-1]['status']}")
         else:
             st.markdown("No ingestion runs logged yet.")
         st.page_link("pages/data_quality.py", label="Ingest more data →", icon="⬇️")

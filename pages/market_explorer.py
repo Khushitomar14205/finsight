@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from pages.common import get_context, demo_banner, require_data, picker_symbols, symbol_info
+from pages.common import get_context, demo_banner, require_data, picker_symbols, symbol_info, trading_dates
 from src.analytics import returns as R
 from src.reporting.report import dataframe_to_csv_bytes
 
@@ -54,10 +54,10 @@ st.download_button("Download filtered dataset (CSV)", dataframe_to_csv_bytes(df)
                    file_name=f"finsight_{symbol}_{start}_{end}.csv", mime="text/csv")
 
 st.subheader("Daily gainers / losers (pick a date)")
-all_df = store.load_all()
-dates = sorted(all_df["date"].dt.date.unique())
+dates = trading_dates(store)
 pick = st.selectbox("Trading date", dates, index=len(dates) - 1)
-movers = R.gainers_losers(all_df[all_df["date"].dt.date == pick], 10)
+day_df = store.load(start=pick, end=pick)   # one day only — never the full dataset
+movers = R.gainers_losers(day_df, 10)
 g, l = st.columns(2)
 with g: st.write("**Gainers**"); st.dataframe(movers["gainers"], use_container_width=True)
 with l: st.write("**Losers**"); st.dataframe(movers["losers"], use_container_width=True)

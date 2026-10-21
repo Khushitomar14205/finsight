@@ -46,10 +46,24 @@ def equity_symbols(df) -> list[str]:
         return sorted(df["symbol"].unique().tolist()) if not df.empty else []
     return sorted(df.loc[df["series"] == "EQ", "symbol"].unique().tolist())
 
+@st.cache_resource(show_spinner=False)
+def _symbol_stats(metadata_dir: str):
+    """Precomputed per-symbol stats (small JSON), if the store has them."""
+    from src.reporting.overview_stats import read_symbol_stats
+    return read_symbol_stats(metadata_dir)
+
 def picker_symbols(store, equities_only: bool) -> list[str]:
     """Symbol list for pickers, optionally restricted to EQ equities.
     The full bhavcopy universe (7k+ symbols) includes NCDs/bonds and other
-    instruments that trade rarely — the toggle keeps pickers usable."""
+    instruments that trade rarely — the toggle keeps pickers usable.
+    Uses precomputed symbol stats when available so the full dataset
+    (642 MB in RAM) is never loaded just to build a dropdown."""
+    stats = _symbol_stats(str(store.metadata_dir))
+    if stats:
+        syms = sorted(stats["symbols"].keys())
+        if equities_only:
+            syms = [s for s in syms if stats["symbols"][s].get("is_equity")]
+        return syms
     if not equities_only:
         return store.available_symbols()
     df = load_all_cached(str(store.processed_dir), str(store.metadata_dir))
@@ -57,6 +71,16 @@ def picker_symbols(store, equities_only: bool) -> list[str]:
 
 def symbol_info(store, symbol: str) -> dict:
     """Availability facts for one symbol, for honest UI captions."""
+    stats = _symbol_stats(str(store.metadata_dir))
+    if stats:
+        entry = stats["symbols"].get(symbol)
+        total_days = stats.get("total_days", 0)
+        if not entry:
+            return {"rows": 0, "total_days": total_days}
+        return {"rows": entry["rows"], "total_days": total_days,
+                "coverage_pct": entry["rows"] / total_days if total_days else 0.0,
+                "series": entry["series"], "is_equity": entry["is_equity"],
+                "start": entry["start"], "end": entry["end"]}
     df = load_all_cached(str(store.processed_dir), str(store.metadata_dir))
     sub = df[df["symbol"] == symbol]
     total_days = df["date"].nunique() if not df.empty else 0
@@ -67,3 +91,11 @@ def symbol_info(store, symbol: str) -> dict:
             "series": sorted(sub["series"].unique().tolist()),
             "is_equity": "EQ" in set(sub["series"].unique()),
             "start": str(sub["date"].min().date()), "end": str(sub["date"].max().date())}
+
+def trading_dates(store) -> list[str]:
+    """All trading dates (ISO strings): precomputed stats if present."""
+    stats = _symbol_stats(str(store.metadata_dir))
+    if stats and stats.get("trading_dates"):
+        return stats["trading_dates"]
+    df = load_all_cached(str(store.processed_dir), str(store.metadata_dir))
+    return [str(d.date()) for d in sorted(df["date"].unique())] if not df.empty else []
