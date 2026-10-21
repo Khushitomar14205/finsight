@@ -70,8 +70,25 @@ class Settings:
             "data_dir": str(self.data_dir),
         }
 
+def _load_streamlit_secrets() -> None:
+    """On Streamlit Cloud, secrets live in st.secrets, not env vars.
+    Copy any recognised keys into the environment (without overriding
+    explicit env/.env values) so the rest of the app is unchanged."""
+    try:
+        import streamlit as st
+        for key in ("LLM_PROVIDER", "GEMINI_API_KEY", "OPENAI_API_KEY", "LLM_MODEL",
+                    "NEWS_API_KEY", "RISK_FREE_RATE", "TRADING_DAYS_PER_YEAR", "FINSIGHT_DATA_DIR"):
+            try:
+                if key in st.secrets:
+                    os.environ.setdefault(key, str(st.secrets[key]))
+            except Exception:
+                break
+    except Exception:
+        pass
+
 def get_settings() -> Settings:
     _load_dotenv()
+    _load_streamlit_secrets()
     data_dir = Path(os.getenv("FINSIGHT_DATA_DIR", "data"))
     if not data_dir.is_absolute():
         data_dir = ROOT / data_dir
