@@ -138,8 +138,8 @@ with c_right:
             for e in log:
                 by_date[e["date"]] = e["status"]
             counts = pd.Series(list(by_date.values())).value_counts()
-            st.markdown(f"**{int(counts.get('success', 0) + counts.get('local_success', 0)):,}** "
-                        f"days downloaded · **{int(counts.get('holiday', 0))}** market holidays · "
+            st.markdown(f"**{int(counts.get('success', 0) + counts.get('local_success', 0) + counts.get('skipped_existing', 0)):,}** "
+                        f"days with data · **{int(counts.get('holiday', 0))}** market holidays · "
                         f"**{int(counts.get('failed', 0))}** failed (retryable)")
             st.caption(f"Latest log entry: {log[-1]['date']} — {log[-1]['status']}")
         else:
