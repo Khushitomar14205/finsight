@@ -57,11 +57,22 @@ def get_historical_prices(ctx, symbols=None, start=None, end=None, **kw):
 def check_data_availability(ctx, symbols=None, **kw):
     cov = ctx.store.coverage()
     out = {"coverage": cov}
+    try:
+        from ..reporting.overview_stats import read_symbol_stats
+        ss = read_symbol_stats(ctx.store.metadata_dir)
+        if ss: out["dataset_trading_days"] = ss.get("total_days")
+    except Exception:
+        pass
     for s in (symbols or []):
         df = _df(ctx, [s])
-        out[s.upper()] = ({"rows": int(len(df)), "start": str(df["date"].min().date()),
-                           "end": str(df["date"].max().date())} if not df.empty
-                          else {"rows": 0, "note": "Symbol not present in local dataset."})
+        if df.empty:
+            out[s.upper()] = {"rows": 0, "note": "Symbol not present in local dataset."}
+        else:
+            last = df.sort_values("date").iloc[-1]
+            out[s.upper()] = {"rows": int(len(df)), "trading_days": int(df["date"].nunique()),
+                              "start": str(df["date"].min().date()), "end": str(df["date"].max().date()),
+                              "latest_close": float(last["close"]),
+                              "latest_close_date": str(last["date"].date())}
     return out
 
 # 4

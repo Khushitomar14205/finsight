@@ -32,31 +32,69 @@ def period_label(start, end):
 
 def _returns(r, plan):
     sym = r.get("symbol", "")
-    lines = [f"**{sym} returned {pct(r.get('total_return'))}** {period_label(r.get('start'), r.get('end'))} "
+    tr = r.get("total_return")
+    lines = [f"**{sym} returned {pct(tr)}** {period_label(r.get('start'), r.get('end'))} "
              f"({r.get('start')} → {r.get('end')}, {r.get('observations')} trading days), "
              f"moving from {rs(r.get('first_close'))} to {rs(r.get('last_close'))}."]
     if r.get("annualized_return") is not None:
-        lines.append(f"Annualized return: {pct(r['annualized_return'])}.")
+        lines.append(f"Annualized return (CAGR): {pct(r['annualized_return'])}.")
     bd, wd = r.get("best_day") or {}, r.get("worst_day") or {}
     if bd.get("return") is not None and wd.get("return") is not None:
         lines.append(f"Best day: {pct(bd['return'])} on {bd.get('date')} · Worst day: {pct(wd['return'])} on {wd.get('date')}.")
+    if isinstance(tr, (int, float)):
+        lines.append(f"In plain terms: ₹100 invested at the first close would have become "
+                     f"₹{100 * (1 + tr):,.2f} at the last close — price change only, before costs and taxes, "
+                     "excluding dividends. Historical performance is not a prediction of future results.")
     return " ".join(lines)
 
 def _volatility(r, plan):
     return (f"**{r.get('symbol')} risk profile** ({r.get('start')} → {r.get('end')}): "
             f"annualized volatility **{pct(r.get('annualized_volatility'), signed=False)}**, "
             f"Sharpe ratio **{num(r.get('sharpe_ratio'))}**, and a maximum drawdown of "
-            f"**{pct(r.get('max_drawdown'))}** (peak {r.get('drawdown_peak_date')} → trough {r.get('drawdown_trough_date')}).")
+            f"**{pct(r.get('max_drawdown'))}** (peak {r.get('drawdown_peak_date')} → trough {r.get('drawdown_trough_date')}). "
+            f"In plain terms: volatility is the size of typical day-to-day swings scaled to a year — higher means a "
+            f"bumpier ride; the drawdown is the worst peak-to-trough fall an investor in this window would have sat through.")
 
 def _compare(r, plan):
-    lines = [f"Comparing over the common period {r.get('common_start')} → {r.get('common_end')}:"]
-    for sym, s in (r.get("symbols") or {}).items():
-        lines.append(f"- **{sym}**: total return {pct(s.get('total_return'))} · annualized {pct(s.get('annualized_return'))} · "
-                     f"volatility {pct(s.get('annualized_volatility'), signed=False)} · Sharpe {num(s.get('sharpe_ratio'))} · "
-                     f"max drawdown {pct(s.get('max_drawdown'))}")
+    stats = r.get("symbols") or {}
+    lines = [f"**Comparison over the common period {r.get('common_start')} → {r.get('common_end')}** "
+             f"— every metric below is calculated on this same range, using aligned observations and the same "
+             f"close-to-close price-return definition for all symbols.",
+             "",
+             "| Symbol | Total return | Ann. return | Volatility | Sharpe | Max drawdown |",
+             "|---|---|---|---|---|---|"]
+    for sym, s in stats.items():
+        lines.append(f"| {sym} | {pct(s.get('total_return'))} | {pct(s.get('annualized_return'))} | "
+                     f"{pct(s.get('annualized_volatility'), signed=False)} | {num(s.get('sharpe_ratio'))} | "
+                     f"{pct(s.get('max_drawdown'))} |")
     missing = {k: v for k, v in (r.get("missing_observations") or {}).items() if v}
     if missing:
-        lines.append(f"Note: missing observations inside the common range: {missing} — thin trading can distort comparisons.")
+        lines.append("")
+        lines.append(f"Missing observations inside the common range: "
+                     + ", ".join(f"{k}: {v}" for k, v in missing.items())
+                     + " — the symbol simply didn't trade on those days; thin trading can distort comparisons.")
+    # Interpretation strictly from the calculated values.
+    if len(stats) >= 2:
+        def pick(key, higher=True):
+            items = [(k, v[key]) for k, v in stats.items() if v.get(key) is not None]
+            return (max if higher else min)(items, key=lambda kv: kv[1]) if items else (None, None)
+        hi_ret = pick("total_return"); hi_vol = pick("annualized_volatility"); big_dd = pick("max_drawdown", higher=False)
+        lines.append("")
+        lines.append(f"**Interpretation:** {hi_ret[0]} had the higher observed return ({pct(hi_ret[1])}); "
+                     f"{hi_vol[0]} was the more volatile ({pct(hi_vol[1], signed=False)} annualized — larger day-to-day swings); "
+                     f"{big_dd[0]} experienced the larger maximum drawdown ({pct(big_dd[1])} peak-to-trough). "
+                     "These are historical facts about this specific period, not predictions or recommendations.")
+    # Corporate-action / suspicious-price warning, verified from each symbol's worst day.
+    for sym, s in stats.items():
+        wd = s.get("worst_day") or {}
+        if isinstance(wd.get("return"), (int, float)) and wd["return"] <= -0.25:
+            lines.append("")
+            lines.append(f"⚠️ **Data-quality warning — {sym}:** its worst day in this period was "
+                         f"{pct(wd['return'])} on {wd.get('date')}. FinSight uses unadjusted closing prices, and a "
+                         "single-day drop of this size usually reflects a corporate action such as a stock split or "
+                         "bonus issue (which mechanically rescales the price) rather than an equivalent economic "
+                         "loss. No adjusted prices are fabricated, so this symbol's period return should be read "
+                         "with that in mind.")
     return "\n".join(lines)
 
 def _indicators(r, plan):
@@ -78,24 +116,78 @@ def _indicators(r, plan):
     return " ".join(parts)
 
 def _prices(r, plan):
-    lines = [f"Found **{r.get('rows')} price rows** for {', '.join(r.get('symbols') or [])} "
-             f"({r.get('start')} → {r.get('end')}). Latest available closes:"]
+    lines = [f"Found **{r.get('rows')} historical price records** for {', '.join(r.get('symbols') or [])} "
+             f"({r.get('start')} → {r.get('end')}). Latest available observation per symbol:",
+             "",
+             "| Symbol | Date | Close | Volume |",
+             "|---|---|---|---|"]
     for row in r.get("latest_rows") or []:
-        lines.append(f"- **{row.get('symbol')}**: {rs(row.get('close'))} on {str(row.get('date'))[:10]} "
-                     f"(volume {num(row.get('volume'), 0)})")
-    lines.append("These are historical closes, not live prices.")
+        lines.append(f"| {row.get('symbol')} | {str(row.get('date'))[:10]} | {rs(row.get('close'))} | "
+                     f"{num(row.get('volume'), 0)} |")
+    lines.append("")
+    lines.append("These are historical end-of-day closes — not live market prices.")
     return "\n".join(lines)
 
 def _availability(r, plan):
     cov = r.get("coverage") or {}
-    lines = [f"The local dataset covers **{cov.get('date_min')} → {cov.get('date_max')}** "
-             f"({cov.get('rows', 0):,} rows, {cov.get('symbols', 0):,} symbols)."]
+    total_days = r.get("dataset_trading_days")
+    head = f"The local dataset holds **{cov.get('rows', 0):,} records** across {cov.get('symbols', 0):,} symbols"
+    if total_days:
+        head += f" over **{total_days:,} trading days**"
+    head += f", spanning {cov.get('date_min')} → {cov.get('date_max')}."
+    lines = [head]
     for key, v in r.items():
-        if key == "coverage" or not isinstance(v, dict): continue
+        if key in ("coverage", "dataset_trading_days") or not isinstance(v, dict): continue
         if v.get("rows"):
-            lines.append(f"- **{key}**: {v['rows']:,} rows, {v.get('start')} → {v.get('end')}.")
+            line = (f"- **{key}**: {v['rows']:,} records = {v.get('trading_days', v['rows']):,} trading days "
+                    f"(one record per day it traded), first observation {v.get('start')}, last {v.get('end')}. "
+                    f"Latest close: {rs(v.get('latest_close'))} on {v.get('latest_close_date')}.")
+            if total_days and v.get("trading_days"):
+                line += f" It traded on {v['trading_days'] / total_days:.0%} of all dataset trading days."
+            line += (" The first/last dates are simply its first and last observations — gaps in between are days "
+                     "it didn't trade (not yet listed, suspended, or illiquid), so coverage inside the range is "
+                     "not necessarily continuous.")
+            lines.append(line)
         else:
-            lines.append(f"- **{key}**: not present in the local dataset.")
+            lines.append(f"- **{key}**: not present in the local dataset — check the symbol spelling, or it may "
+                         "trade under a different ticker / only on another exchange.")
+    lines.append("Records existing is not proof of completeness: FinSight validates each ingested file "
+                 "(duplicates, OHLC sanity), and quality details are on the Data Quality page.")
+    return "\n".join(lines)
+
+def _ml(r, plan):
+    res = r.get("results") or {}
+    model_key = r.get("model") or next((k for k in res if k not in ("baseline_zero_return", "strategy_test",
+                                                                    "feature_importance")), "model")
+    m = res.get(model_key) or {}
+    base = res.get("baseline_zero_return") or {}
+    counts = r.get("split_counts") or {}
+    split = r.get("split") or {}
+    lines = [f"**ML experiment — {r.get('symbol')}** ({r.get('task', 'regression')} · model: **{model_key}**)",
+             f"Target: {r.get('target', 'next-day return')}. Features: {', '.join(r.get('features') or [])}.",
+             f"Data: {r.get('rows_used')} usable observations after feature construction, split chronologically "
+             f"(no shuffling): train {counts.get('train')} rows ({(split.get('train') or ['?','?'])[0]} → "
+             f"{(split.get('train') or ['?','?'])[1]}), validation {counts.get('validation')} rows, "
+             f"test {counts.get('test')} rows ({(split.get('test') or ['?','?'])[0]} → {(split.get('test') or ['?','?'])[1]}). "
+             "The model is fit on the training segment only; all metrics below are on the held-out test segment.",
+             "",
+             f"**Test results:** MAE {num(m.get('mae'), 4)}, RMSE {num(m.get('rmse'), 4)}, "
+             f"directional accuracy {pct(m.get('directional_accuracy'), signed=False)}.",
+             f"**Baseline (always predict zero return):** MAE {num(base.get('mae'), 4)}, RMSE {num(base.get('rmse'), 4)}, "
+             f"directional accuracy {pct(base.get('directional_accuracy'), signed=False)}. "
+             "A useful model must beat this baseline — directional accuracy near 50% is chance level."]
+    strat = res.get("strategy_test") or {}
+    if strat:
+        lines.append(f"For reference, a simple long/flat rule on the model's test predictions returned "
+                     f"{pct(strat.get('cumulative_strategy_return_after_costs'))} after costs vs "
+                     f"{pct(strat.get('cumulative_buy_and_hold_return_test'))} for buy-and-hold over the same test "
+                     "window — a backtest on one historical window, not evidence of a reliable trading signal.")
+    fi = res.get("feature_importance")
+    if isinstance(fi, dict) and fi:
+        top = list(fi.items())[:3]
+        lines.append("Most influential features: " + ", ".join(f"{k} ({v:.2f})" for k, v in top) + ".")
+    if r.get("limitations"):
+        lines.append(f"Limitations: {r['limitations']}")
     return "\n".join(lines)
 
 def _validate(r, plan):
@@ -200,6 +292,7 @@ _FORMATTERS = {
     "portfolio_risk": _portfolio,
     "portfolio_optimization": _portfolio,
     "what_if_analysis": _portfolio,
+    "run_ml_experiment": _ml,
 }
 
 def humanize(tool_name: str, result: dict, plan: dict | None = None) -> str:

@@ -81,11 +81,15 @@ def run_experiment(df_symbol: pd.DataFrame, model_name: str = "random_forest",
                                                      key=lambda kv: -kv[1])) if hasattr(model, "feature_importances_") else None)
     return {
         "symbol": str(df_symbol["symbol"].iloc[0]),
+        "model": model_name, "task": "regression",
+        "target": "next-day close-to-close return",
         "rows_used": int(n), "features": feature_cols,
         "split": {"train": [str(train['date'].min().date()), str(train['date'].max().date())],
                   "validation": [str(val['date'].min().date()), str(val['date'].max().date())] if len(val) else None,
                   "test": [str(test['date'].min().date()), str(test['date'].max().date())]},
-        "split_method": "chronological 60/20/20, no shuffling, features use only past data",
+        "split_counts": {"train": int(n_train), "validation": int(n_val), "test": int(n - n_train - n_val)},
+        "split_method": "chronological 60/20/20, no shuffling, features use only past data; "
+                        "model is fit on the training segment only and evaluated on the test segment",
         "results": results,
         "limitations": "Experimental research only. Financial time series are noisy and non-stationary; "
                        "directional accuracy near 50% is chance. This is not a price prediction or investment advice.",
