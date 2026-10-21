@@ -18,3 +18,17 @@ generate_report.
 Respond with ONLY JSON like {{"tool": "...", "symbols": ["RELIANCE"], "start": "2023-01-01", "end": "2023-12-31"}}.
 Use null for unknown fields. Question: {question}
 Known symbols: {symbols}"""
+
+SUMMARY_PROMPT = """Write the final answer to the user's question using ONLY the facts in the tool result below.
+
+Style rules:
+- Sound like a knowledgeable person answering in chat: 2-5 short sentences, or a short lead sentence plus a compact list for comparisons.
+- Lead with the headline answer (e.g. the return, the volatility, the comparison winner).
+- Format returns/drawdowns as signed percentages (e.g. +0.35%, -12.40%), volatility as a percentage, prices in ₹ with commas (e.g. ₹2,584.95).
+- Mention the symbol(s) and the exact period the numbers cover.
+- NEVER mention tool names, JSON, function calls, or "the data shows" filler. Never output raw field names.
+- Do not add any fact, reason, or context that is not in the tool result. No predictions, no investment advice.
+- End without a disclaimer paragraph; at most one short clause noting the data is historical if the period is old.
+
+User question: {question}
+Tool result (JSON): {result}"""

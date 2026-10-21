@@ -10,14 +10,15 @@ from __future__ import annotations
 import json, re
 from .state import AgentState
 from .tools import TOOL_REGISTRY, AgentContext
-from .prompts import SYSTEM_PROMPT, PLAN_PROMPT
+from .prompts import SYSTEM_PROMPT, PLAN_PROMPT, SUMMARY_PROMPT
+from .humanize import humanize
 
 _DATE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 _YEAR = re.compile(r"\b(20\d{2})\b")
 
 def extract_symbols(question: str, available: list[str]) -> list[str]:
-    q = " " + question.upper() + " "
-    return [s for s in available if f" {s} " in q or f" {s}," in q or q.strip().endswith(s)]
+    q = " " + re.sub(r"[^A-Z0-9]", " ", question.upper()) + " "
+    return [s for s in available if f" {s} " in q]
 
 def extract_dates(question: str) -> tuple[str | None, str | None]:
     dates = _DATE.findall(question)
@@ -93,20 +94,55 @@ def llm_plan(question: str, ctx: AgentContext, settings) -> dict | None:
     except Exception:
         return None
 
-def format_answer(tool_name: str, result: dict, plan: dict) -> str:
-    """Deterministic, faithful rendering of the tool result."""
+def _make_llm(settings):
+    if settings.llm_provider == "gemini":
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        return ChatGoogleGenerativeAI(model=settings.llm_model, google_api_key=settings.gemini_api_key, temperature=0)
+    if settings.llm_provider == "openai":
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(model=settings.llm_model, api_key=settings.openai_api_key, temperature=0)
+    return None
+
+def llm_summarize(question: str, result: dict, settings) -> str | None:
+    """Ask the LLM to phrase the tool result as a clean, human answer.
+    Returns None on any failure so the deterministic humanizer takes over."""
+    try:
+        llm = _make_llm(settings)
+        if llm is None: return None
+        msg = llm.invoke(SYSTEM_PROMPT + "\n\n" + SUMMARY_PROMPT.format(
+            question=question, result=json.dumps(result, default=str)[:6000]))
+        text = msg.content if isinstance(msg.content, str) else str(msg.content)
+        text = text.strip()
+        # Guardrails: reject anything that smells like a raw dump or an error.
+        if not text or len(text) < 10 or text.startswith("{") or "tool_used" in text:
+            return None
+        return text
+    except Exception:
+        return None
+
+def _extreme_move_note(tool_name: str, result: dict) -> str:
+    """Unadjusted prices turn splits/bonuses into fake crashes (e.g. RELIANCE's
+    1:1 bonus on 2024-10-28 reads as a -49.8% day). Flag it in plain words."""
+    if tool_name == "calculate_returns":
+        wd = result.get("worst_day") or {}
+        if isinstance(wd.get("return"), (int, float)) and wd["return"] <= -0.25:
+            return (f"\n\n⚠️ Note: this window contains an extreme single-day move "
+                    f"({wd['return']:+.1%} on {wd.get('date')}). Prices here are unadjusted, so this "
+                    f"usually reflects a stock split or bonus issue rather than an actual loss of that size.")
+    return ""
+
+def format_answer(tool_name: str, result: dict, plan: dict, question: str = "", settings=None) -> str:
+    """The user-facing answer: LLM phrasing when available, otherwise the
+    deterministic plain-English humanizer. Raw tool JSON never reaches the
+    chat — it stays available in the result's tool trace."""
     if tool_name == "generate_report":
         return result.get("report_markdown", "Report generated.")
-    lines = [f"Tool used: {tool_name}"]
-    if plan.get("symbols"): lines.append(f"Symbols: {', '.join(plan['symbols'])}")
-    if plan.get("start") or plan.get("end"):
-        lines.append(f"Requested range: {plan.get('start') or 'earliest'} to {plan.get('end') or 'latest available'}")
-    lines.append("")
-    lines.append(json.dumps(result, indent=2, default=str)[:6000])
-    lines.append("")
-    lines.append("Methodology: deterministic Python analytics on local historical (unadjusted) bhavcopy data. "
-                 "Historical closes are not live prices. Past performance does not predict future results.")
-    return "\n".join(lines)
+    note = _extreme_move_note(tool_name, result)
+    if settings is not None and getattr(settings, "has_llm", False):
+        summary = llm_summarize(question, result, settings)
+        if summary:
+            return summary + note
+    return humanize(tool_name, result, plan) + note
 
 def _route(state: AgentState, ctx: AgentContext, settings=None) -> AgentState:
     plan = None
@@ -126,14 +162,15 @@ def _execute(state: AgentState, ctx: AgentContext) -> AgentState:
     except Exception as e:
         return {**state, "error": str(e)}
 
-def _respond(state: AgentState) -> AgentState:
+def _respond(state: AgentState, settings=None) -> AgentState:
     if state.get("error"):
         answer = (f"I couldn't complete that with the available data/tools.\n\n"
                   f"Reason: {state['error']}\n\n"
                   "Nothing was fabricated — please check the symbol names, date range, "
                   "and whether the data has been ingested (Data Quality page) or a portfolio has been built.")
         return {**state, "answer": answer}
-    return {**state, "answer": format_answer(state["tool_name"], state["tool_result"], state["plan"])}
+    return {**state, "answer": format_answer(state["tool_name"], state["tool_result"], state["plan"],
+                                              question=state.get("question", ""), settings=settings)}
 
 def build_graph(ctx: AgentContext, settings=None):
     """Compile the LangGraph workflow; falls back to the same nodes run
@@ -143,7 +180,7 @@ def build_graph(ctx: AgentContext, settings=None):
         g = StateGraph(AgentState)
         g.add_node("route", lambda s: _route(s, ctx, settings))
         g.add_node("execute", lambda s: _execute(s, ctx))
-        g.add_node("respond", _respond)
+        g.add_node("respond", lambda s: _respond(s, settings))
         g.add_edge(START, "route"); g.add_edge("route", "execute")
         g.add_edge("execute", "respond"); g.add_edge("respond", END)
         return g.compile()
@@ -156,7 +193,7 @@ def run_agent(question: str, ctx: AgentContext, settings=None, history: list | N
     if graph is not None:
         final = graph.invoke(state)
     else:
-        final = _respond(_execute(_route(state, ctx, settings), ctx))
+        final = _respond(_execute(_route(state, ctx, settings), ctx), settings)
     return {"answer": final.get("answer", ""), "tool_used": final.get("tool_name"),
             "plan": final.get("plan"), "tool_result": final.get("tool_result"),
             "error": final.get("error")}
