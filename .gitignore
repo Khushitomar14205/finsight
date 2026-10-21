@@ -13,3 +13,5 @@ logs/*
 !logs/.gitkeep
 *.duckdb
 .streamlit/secrets.toml
+
+.pytest_cache/
