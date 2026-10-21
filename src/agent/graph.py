@@ -75,14 +75,8 @@ def rule_based_plan(question: str, ctx: AgentContext) -> dict:
 def llm_plan(question: str, ctx: AgentContext, settings) -> dict | None:
     """Ask the configured LLM for a routing plan. Returns None on any failure."""
     try:
-        if settings.llm_provider == "gemini":
-            from langchain_google_genai import ChatGoogleGenerativeAI
-            llm = ChatGoogleGenerativeAI(model=settings.llm_model, google_api_key=settings.gemini_api_key, temperature=0)
-        elif settings.llm_provider == "openai":
-            from langchain_openai import ChatOpenAI
-            llm = ChatOpenAI(model=settings.llm_model, api_key=settings.openai_api_key, temperature=0)
-        else:
-            return None
+        llm = _make_llm(settings)
+        if llm is None: return None
         msg = llm.invoke(SYSTEM_PROMPT + "\n\n" + PLAN_PROMPT.format(
             question=question, symbols=", ".join(ctx.store.available_symbols()[:200])))
         text = msg.content if isinstance(msg.content, str) else str(msg.content)
@@ -91,16 +85,22 @@ def llm_plan(question: str, ctx: AgentContext, settings) -> dict | None:
         plan = json.loads(m.group(0))
         if plan.get("tool") not in TOOL_REGISTRY: return None
         return plan
-    except Exception:
+    except Exception as e:
+        print(f"[agent] llm_plan failed ({type(e).__name__}: {e}); using rule-based router", flush=True)
         return None
 
 def _make_llm(settings):
+    """LLM client with bounded latency: if the provider is slow or down, the
+    agent must fall back fast instead of leaving the user staring at a
+    spinner (observed: unbounded calls made answers take minutes)."""
     if settings.llm_provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
-        return ChatGoogleGenerativeAI(model=settings.llm_model, google_api_key=settings.gemini_api_key, temperature=0)
+        return ChatGoogleGenerativeAI(model=settings.llm_model, google_api_key=settings.gemini_api_key,
+                                      temperature=0, timeout=30, max_retries=1)
     if settings.llm_provider == "openai":
         from langchain_openai import ChatOpenAI
-        return ChatOpenAI(model=settings.llm_model, api_key=settings.openai_api_key, temperature=0)
+        return ChatOpenAI(model=settings.llm_model, api_key=settings.openai_api_key,
+                          temperature=0, timeout=30, max_retries=1)
     return None
 
 def llm_summarize(question: str, result: dict, settings) -> str | None:
@@ -117,7 +117,8 @@ def llm_summarize(question: str, result: dict, settings) -> str | None:
         if not text or len(text) < 10 or text.startswith("{") or "tool_used" in text:
             return None
         return text
-    except Exception:
+    except Exception as e:
+        print(f"[agent] llm_summarize failed ({type(e).__name__}: {e}); using humanizer", flush=True)
         return None
 
 def _extreme_move_note(tool_name: str, result: dict) -> str:
