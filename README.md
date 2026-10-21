@@ -74,13 +74,15 @@ python scripts/ingest.py --start 2025-01-01 --end 2025-01-31
 python scripts/ingest.py --local data/raw/cm02JAN2023bhav.csv.zip
 ```
 
-Verified from this environment on 2026-10-21: legacy file for 2023-01-02 and UDiFF files for 2025-01-02/03/06 downloaded and normalized successfully (~2.4k–3.0k rows per day). One earlier request returned HTTP 403 from NSE's Akamai layer — such failures are recorded in `data/metadata/ingestion_log.jsonl` with the HTTP detail, and re-running the same range retries them. Full 2020–2026 history is a large download (~1,700 trading days); ingest it in monthly chunks.
+Full-history ingestion was completed from this environment on 2026-10-21 using `scripts/ingest_bulk.py --start 2020-01-01 --end 2026-10-06` (monthly chunks, resumable). Final verified dataset: **4,106,326 rows, 7,085 symbols, 1,672 trading days, 2020-01-01 → 2026-10-06, 189 MB of partitioned Parquet**. Per-date final status: 1,672 days with data, 93 market holidays (weekdays where NSE published no bhavcopy — classified `holiday`, not `failed`), 0 unresolved failures. Data-quality validation on the full dataset: 0 duplicate symbol-dates, 0 OHLC violations, 0 non-positive prices, 0 negative volumes; 797 extreme (>50%) daily moves flagged (expected with unadjusted prices — splits/bonuses). One mid-run interruption (NSE read-timeouts followed by a process restart) was recovered simply by re-running the same command. Occasional HTTP 403 responses from NSE's Akamai layer are recorded in `data/metadata/ingestion_log.jsonl` with the HTTP detail and are retried on re-runs.
 
-For trying the interface before ingesting real data:
+For trying the interface without real data:
 
 ```bash
 python scripts/generate_demo_data.py   # SYNTHETIC, seeded, clearly flagged in the UI — not real market data
 ```
+
+(Note: this replaces the stored dataset with synthetic data. The real 2020–2026 dataset described above is what the app ships with locally; don't run the demo script unless you want to reset to demo data — real data can be restored with `ingest_bulk.py`.)
 
 ## Run
 
