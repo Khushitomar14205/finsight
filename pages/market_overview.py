@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-from pages.common import get_context, demo_banner, require_data, load_all_cached
+from pages.common import get_context, demo_banner, require_data, load_all_cached, fmt_date
 from src.analytics import returns as R
 from src.data_processing.validation import validate_dataframe
 from src.data_ingestion.downloader import BhavcopyDownloader
@@ -70,7 +70,7 @@ else:
 # ---------- Market pulse ----------
 adv, dec, unch = pulse["advancers"], pulse["decliners"], pulse["unchanged"]
 with st.container(border=True):
-    st.subheader(f"🫀 Market pulse — {pulse['date']} (latest available day)")
+    st.subheader(f"🫀 Market pulse — {fmt_date(pulse['date'])} (latest available day)")
     p1, p2, p3, p4 = st.columns(4)
     p1.metric("Advancers", f"{adv:,}", delta=f"{adv / max(pulse['traded'],1):.0%} of traded symbols")
     p2.metric("Decliners", f"{dec:,}", delta=f"{dec / max(pulse['traded'],1):.0%} of traded symbols", delta_color="inverse")

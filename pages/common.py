@@ -31,6 +31,46 @@ def require_data(store) -> bool:
 def get_portfolio_weights() -> dict:
     return st.session_state.get("portfolio_weights", {})
 
+# ---------- Shared formatting (one definition of how numbers/dates look) ----------
+def fmt_pct(x, dp: int = 2, signed: bool = False) -> str:
+    """Fraction -> percentage string. fmt_pct(0.0035) = '0.35%'."""
+    if x is None: return "—"
+    try:
+        return f"{x:+.{dp}%}" if signed else f"{x:.{dp}%}"
+    except Exception:
+        return str(x)
+
+def fmt_rs(x, dp: int = 2) -> str:
+    if x is None: return "—"
+    try: return f"₹{x:,.{dp}f}"
+    except Exception: return str(x)
+
+def fmt_num(x, dp: int = 2) -> str:
+    if x is None: return "—"
+    try: return f"{x:,.{dp}f}"
+    except Exception: return str(x)
+
+def fmt_date(d) -> str:
+    """'2023-03-31' / date / Timestamp -> '31 Mar 2023' (never truncated)."""
+    if d is None: return "—"
+    try:
+        import pandas as pd
+        return pd.Timestamp(d).strftime("%d %b %Y")
+    except Exception:
+        return str(d)
+
+METRIC_HELP = {
+    "total_return": "Total price return over the selected period: last close ÷ first close − 1. Uses unadjusted closes, so splits/bonuses can distort it. Dividends are not included (price return, not total return).",
+    "annualized_return": "Compound annual growth rate (CAGR): the constant yearly rate that connects the first and last close over the period.",
+    "volatility": "Annualized volatility: standard deviation of daily returns × √252. Higher means larger day-to-day swings. It measures variability, not direction.",
+    "sharpe": "Sharpe ratio: (annualized excess return over the risk-free rate) ÷ annualized volatility. Higher means more return per unit of risk taken. Uses the configured risk-free rate.",
+    "max_drawdown": "Maximum drawdown: the largest peak-to-trough fall in price within the period. E.g. −25% means the price once fell 25% from an earlier peak to a later low.",
+    "rsi": "Relative Strength Index (0–100): momentum of recent gains vs losses. Above 70 is conventionally 'overbought', below 30 'oversold' — descriptive zones, not buy/sell signals.",
+    "macd": "MACD: difference between the 12-day and 26-day exponential moving averages; the signal line is its 9-day EMA. MACD above the signal line indicates strengthening short-term momentum.",
+    "atr": "Average True Range: average daily price range (including gaps) over the window — a volatility measure in ₹.",
+    "correlation": "Correlation of daily returns (−1 to +1): +1 = moved together, 0 = unrelated, −1 = moved oppositely. Computed on common trading dates only.",
+}
+
 @st.cache_resource(show_spinner=False)
 def load_all_cached(processed_dir: str, metadata_dir: str):
     """Full dataset as ONE shared in-memory copy across sessions.

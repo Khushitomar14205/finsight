@@ -122,6 +122,10 @@ def compare_symbols(store_df: pd.DataFrame, symbols: list[str], risk_free_rate: 
     total_days = len(wide)
     for s in symbols:
         out["missing_observations"][s.upper()] = int(total_days - wide[s.upper()].notna().sum())
-    rets = wide.pct_change().dropna(how="all")
-    out["correlation"] = correlation_matrix(rets).round(4).to_dict()
+    # Correlation uses complete cases on common dates only — the SAME
+    # definition as the Stock Comparison page and the correlation tool, so
+    # numbers agree across modules. Needs >= 3 shared observations.
+    rets = wide.pct_change().dropna(how="any")
+    out["correlation"] = correlation_matrix(rets).round(4).to_dict() if len(rets) >= 3 else {}
+    out["correlation_observations"] = int(len(rets))
     return out

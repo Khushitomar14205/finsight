@@ -40,6 +40,29 @@ if cov.get("has_data"):
             st.write(f"- {issue}")
     st.caption("Prices are unadjusted bhavcopy values. Corporate actions can create flagged extreme moves; "
                "missing weekday sessions include market holidays and are not automatically errors.")
+    with st.expander("ℹ️ How to read these warnings"):
+        st.markdown(
+            "- **Extreme moves (>50% in a day)** are *flagged, never deleted*. On unadjusted prices, stock splits "
+            "and bonus issues look exactly like crashes (e.g. a 1:1 bonus halves the price overnight). Genuine "
+            "crashes also occur — the flag means 'inspect this', not 'this is wrong'.\n"
+            "- **Missing weekday sessions** are dates where NSE published no bhavcopy — almost always market "
+            "holidays, not missing data.\n"
+            "- **Duplicates / OHLC violations / non-positive prices** would be real data problems; FinSight's "
+            "ingestion de-duplicates and validates every file, and the counts above are currently zero.")
+    if pre and pre.get("flagged_records"):
+        st.subheader(f"Flagged records — largest extreme moves (showing {len(pre['flagged_records'])} of "
+                     f"{pre['quality']['extreme_moves']})")
+        st.caption("Flagged observations are kept in the dataset. Most are splits/bonuses on unadjusted prices.")
+        fdf = pd.DataFrame(pre["flagged_records"])
+        st.dataframe(fdf, use_container_width=True, hide_index=True, height=300,
+                     column_config={
+                         "date": st.column_config.TextColumn("Date"),
+                         "prev_close": st.column_config.NumberColumn("Prev close (₹)", format="%.2f"),
+                         "close": st.column_config.NumberColumn("Close (₹)", format="%.2f"),
+                         "change_pct": st.column_config.NumberColumn("Change", format="percent"),
+                     })
+        st.download_button("Download flagged records (CSV)", fdf.to_csv(index=False).encode(),
+                           file_name="finsight_flagged_records.csv", mime="text/csv")
 
 st.subheader("Ingest new data")
 c1, c2 = st.columns(2)

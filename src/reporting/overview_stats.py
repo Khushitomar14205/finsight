@@ -30,6 +30,19 @@ def build_overview_stats(store) -> dict:
     yearly = (df.assign(year=df["date"].dt.year).groupby("year")
                 .agg(records=("close", "size"), symbols=("symbol", "nunique")).reset_index())
     rep = validate_dataframe(df)
+    # Flagged records: the largest extreme daily moves, kept (never deleted)
+    # so users can inspect exactly which observations were flagged and why.
+    d = df.sort_values(["symbol", "date"])
+    chg = d.groupby("symbol")["close"].pct_change()
+    prev = d.groupby("symbol")["close"].shift(1)
+    flagged_idx = chg[chg.abs() > 0.5].index
+    flagged_records = []
+    for idx in flagged_idx:
+        row = d.loc[idx]
+        flagged_records.append({"symbol": str(row["symbol"]), "date": str(row["date"].date()),
+                                "prev_close": float(prev.loc[idx]), "close": float(row["close"]),
+                                "change_pct": float(chg.loc[idx])})
+    flagged_records.sort(key=lambda r: abs(r["change_pct"]), reverse=True)
     stats = {
         "generated_for_latest_date": str(latest.date()),
         "pulse": {
@@ -53,6 +66,7 @@ def build_overview_stats(store) -> dict:
             "extreme_moves": int(rep.extreme_daily_moves),
             "missing_sessions": int(rep.missing_weekday_sessions),
         },
+        "flagged_records": flagged_records[:200],
     }
     out = Path(store.metadata_dir) / STATS_FILE
     out.write_text(json.dumps(stats, indent=1))

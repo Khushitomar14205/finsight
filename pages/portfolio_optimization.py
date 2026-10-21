@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from pages.common import get_context, demo_banner, require_data, get_portfolio_weights
+from pages.common import get_context, demo_banner, require_data, get_portfolio_weights, fmt_pct, fmt_num
 from src.optimization import optimizer as OPT
 from src.portfolio import engine as PE
 
@@ -33,14 +33,14 @@ if len(picked) >= 2 and st.button("Run optimization comparison"):
 results = st.session_state.get("opt_results")
 if results:
     rows = [{"Allocation": name,
-             "Total return": r["performance"]["total_return"],
-             "Ann. return": r["performance"]["annualized_return"],
-             "Volatility": r["risk"]["annualized_volatility"],
-             "Sharpe": r["risk"]["sharpe_ratio"],
-             "Max drawdown": r["risk"]["max_drawdown"],
+             "Total return": fmt_pct(r["performance"]["total_return"]),
+             "Ann. return": fmt_pct(r["performance"]["annualized_return"]),
+             "Volatility": fmt_pct(r["risk"]["annualized_volatility"]),
+             "Sharpe": fmt_num(r["risk"]["sharpe_ratio"]),
+             "Max drawdown": fmt_pct(r["risk"]["max_drawdown"]),
              "Weights": ", ".join(f"{k} {v:.0%}" for k, v in r["weights"].items())}
             for name, r in results.items()]
-    st.dataframe(pd.DataFrame(rows), use_container_width=True)
+    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
 st.subheader("What-if: adjust weights")
 base = get_portfolio_weights()
@@ -61,11 +61,12 @@ elif st.button("Compare what-if vs current"):
         out = OPT.what_if(df, base, PE.validate_weights(new), risk_free_rate=settings.risk_free_rate)
         rows = []
         for label, part in (("Current", out["base"]), ("Proposed", out["proposed"])):
-            rows.append({"Scenario": label, "Total return": part["performance"]["total_return"],
-                         "Volatility": part["risk"]["annualized_volatility"],
-                         "Sharpe": part["risk"]["sharpe_ratio"], "Max drawdown": part["risk"]["max_drawdown"],
+            rows.append({"Scenario": label, "Total return": fmt_pct(part["performance"]["total_return"]),
+                         "Volatility": fmt_pct(part["risk"]["annualized_volatility"]),
+                         "Sharpe": fmt_num(part["risk"]["sharpe_ratio"]),
+                         "Max drawdown": fmt_pct(part["risk"]["max_drawdown"]),
                          "Weights": ", ".join(f"{k} {v:.0%}" for k, v in part["weights"].items())})
-        st.dataframe(pd.DataFrame(rows), use_container_width=True)
+        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
         st.caption(out["note"])
     except Exception as e:
         st.error(str(e))

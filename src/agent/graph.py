@@ -138,18 +138,36 @@ def format_answer(tool_name: str, result: dict, plan: dict, question: str = "", 
     if tool_name == "generate_report":
         return result.get("report_markdown", "Report generated.")
     note = _extreme_move_note(tool_name, result)
+    prefix = ""
+    if plan.get("live_requested"):
+        prefix = ("⚠️ FinSight has no live or intraday data — it works on end-of-day NSE bhavcopy files. "
+                  "Showing the latest available data instead.\n\n")
     if settings is not None and getattr(settings, "has_llm", False):
         summary = llm_summarize(question, result, settings)
         if summary:
-            return summary + note
-    return humanize(tool_name, result, plan) + note
+            return prefix + summary + note
+    return prefix + humanize(tool_name, result, plan) + note
 
-def _route(state: AgentState, ctx: AgentContext, settings=None) -> AgentState:
+_LIVE_RE = re.compile(r"\blive\b|right now|current price|today'?s price|intraday|real.?time", re.IGNORECASE)
+
+def _route(state: AgentState, ctx: AgentContext, settings=None, context_plan: dict | None = None) -> AgentState:
     plan = None
     if settings is not None and getattr(settings, "has_llm", False):
         plan = llm_plan(state["question"], ctx, settings)
     if plan is None:
         plan = rule_based_plan(state["question"], ctx)
+    # Contextual follow-ups: if the new question names no symbols/dates of its
+    # own, inherit them from the previous question's plan ("and in 2024?"
+    # after asking about RELIANCE keeps RELIANCE; an explicit new year wins).
+    if context_plan:
+        if not plan.get("symbols") and context_plan.get("symbols"):
+            plan["symbols"] = context_plan["symbols"]
+        if not plan.get("start") and context_plan.get("start"):
+            plan["start"] = context_plan["start"]
+        if not plan.get("end") and context_plan.get("end"):
+            plan["end"] = context_plan["end"]
+    if _LIVE_RE.search(state["question"]):
+        plan["live_requested"] = True
     return {**state, "plan": plan, "tool_name": plan["tool"]}
 
 def _execute(state: AgentState, ctx: AgentContext) -> AgentState:
@@ -172,13 +190,13 @@ def _respond(state: AgentState, settings=None) -> AgentState:
     return {**state, "answer": format_answer(state["tool_name"], state["tool_result"], state["plan"],
                                               question=state.get("question", ""), settings=settings)}
 
-def build_graph(ctx: AgentContext, settings=None):
+def build_graph(ctx: AgentContext, settings=None, context_plan: dict | None = None):
     """Compile the LangGraph workflow; falls back to the same nodes run
     directly if langgraph is unavailable."""
     try:
         from langgraph.graph import StateGraph, START, END
         g = StateGraph(AgentState)
-        g.add_node("route", lambda s: _route(s, ctx, settings))
+        g.add_node("route", lambda s: _route(s, ctx, settings, context_plan))
         g.add_node("execute", lambda s: _execute(s, ctx))
         g.add_node("respond", lambda s: _respond(s, settings))
         g.add_edge(START, "route"); g.add_edge("route", "execute")
@@ -187,13 +205,14 @@ def build_graph(ctx: AgentContext, settings=None):
     except Exception:
         return None
 
-def run_agent(question: str, ctx: AgentContext, settings=None, history: list | None = None) -> dict:
+def run_agent(question: str, ctx: AgentContext, settings=None, history: list | None = None,
+              context_plan: dict | None = None) -> dict:
     state: AgentState = {"question": question, "history": history or []}
-    graph = build_graph(ctx, settings)
+    graph = build_graph(ctx, settings, context_plan)
     if graph is not None:
         final = graph.invoke(state)
     else:
-        final = _respond(_execute(_route(state, ctx, settings), ctx), settings)
+        final = _respond(_execute(_route(state, ctx, settings, context_plan), ctx), settings)
     return {"answer": final.get("answer", ""), "tool_used": final.get("tool_name"),
             "plan": final.get("plan"), "tool_result": final.get("tool_result"),
             "error": final.get("error")}

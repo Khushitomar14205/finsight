@@ -177,5 +177,1407 @@
   "negative_volume": 0,
   "extreme_moves": 797,
   "missing_sessions": 93
- }
+ },
+ "flagged_records": [
+  {
+   "symbol": "KAUSHALYA",
+   "date": "2024-02-06",
+   "prev_close": 9.85,
+   "close": 988.3,
+   "change_pct": 99.33502538071066
+  },
+  {
+   "symbol": "MBECL",
+   "date": "2026-09-01",
+   "prev_close": 3.27,
+   "close": 223.65,
+   "change_pct": 67.39449541284404
+  },
+  {
+   "symbol": "WINSOME",
+   "date": "2023-09-26",
+   "prev_close": 0.15,
+   "close": 8.55,
+   "change_pct": 56.00000000000001
+  },
+  {
+   "symbol": "ARIHANT",
+   "date": "2026-04-20",
+   "prev_close": 39.65,
+   "close": 907.55,
+   "change_pct": 21.8890290037831
+  },
+  {
+   "symbol": "DHFL",
+   "date": "2021-06-14",
+   "prev_close": 16.7,
+   "close": 340.0,
+   "change_pct": 19.35928143712575
+  },
+  {
+   "symbol": "EASTSILK",
+   "date": "2025-08-18",
+   "prev_close": 1.8,
+   "close": 25.2,
+   "change_pct": 13.0
+  },
+  {
+   "symbol": "SUMEETINDS",
+   "date": "2025-06-19",
+   "prev_close": 4.89,
+   "close": 55.96,
+   "change_pct": 10.443762781186095
+  },
+  {
+   "symbol": "SHEKHAWATI",
+   "date": "2024-09-10",
+   "prev_close": 8.82,
+   "close": 86.43,
+   "change_pct": 8.799319727891158
+  },
+  {
+   "symbol": "VERTOZ",
+   "date": "2025-07-11",
+   "prev_close": 9.17,
+   "close": 87.11,
+   "change_pct": 8.499454743729553
+  },
+  {
+   "symbol": "CCCL",
+   "date": "2024-09-03",
+   "prev_close": 1.5,
+   "close": 11.44,
+   "change_pct": 6.626666666666666
+  },
+  {
+   "symbol": "RADIOCITY",
+   "date": "2023-07-18",
+   "prev_close": 12.95,
+   "close": 88.55,
+   "change_pct": 5.837837837837838
+  },
+  {
+   "symbol": "RADIOCITY",
+   "date": "2023-07-11",
+   "prev_close": 13.2,
+   "close": 88.8,
+   "change_pct": 5.7272727272727275
+  },
+  {
+   "symbol": "VIVIMEDLAB",
+   "date": "2025-12-18",
+   "prev_close": 4.95,
+   "close": 26.6,
+   "change_pct": 4.373737373737374
+  },
+  {
+   "symbol": "AARTISURF",
+   "date": "2024-10-09",
+   "prev_close": 197.5,
+   "close": 794.3,
+   "change_pct": 3.021772151898734
+  },
+  {
+   "symbol": "UEL",
+   "date": "2024-05-27",
+   "prev_close": 43.8,
+   "close": 160.95,
+   "change_pct": 2.6746575342465753
+  },
+  {
+   "symbol": "BURNPUR",
+   "date": "2026-08-11",
+   "prev_close": 6.6,
+   "close": 21.35,
+   "change_pct": 2.2348484848484853
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2023-02-20",
+   "prev_close": 95.0,
+   "close": 300.0,
+   "change_pct": 2.1578947368421053
+  },
+  {
+   "symbol": "CAPTRU-RE",
+   "date": "2025-07-14",
+   "prev_close": 0.12,
+   "close": 0.35,
+   "change_pct": 1.9166666666666665
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2022-10-28",
+   "prev_close": 109.74,
+   "close": 300.01,
+   "change_pct": 1.7338254055039184
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2023-07-13",
+   "prev_close": 114.5,
+   "close": 311.09,
+   "change_pct": 1.7169432314410478
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2023-06-08",
+   "prev_close": 114.0,
+   "close": 308.86,
+   "change_pct": 1.7092982456140353
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2023-04-21",
+   "prev_close": 113.0,
+   "close": 306.14,
+   "change_pct": 1.7092035398230085
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2023-08-09",
+   "prev_close": 116.45,
+   "close": 312.05,
+   "change_pct": 1.6796908544439675
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2023-07-24",
+   "prev_close": 116.5,
+   "close": 312.06,
+   "change_pct": 1.6786266094420603
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2023-07-17",
+   "prev_close": 118.75,
+   "close": 312.99,
+   "change_pct": 1.6357052631578948
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2023-09-27",
+   "prev_close": 119.8,
+   "close": 313.92,
+   "change_pct": 1.620367278797997
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2023-06-28",
+   "prev_close": 119.45,
+   "close": 309.99,
+   "change_pct": 1.5951444118878193
+  },
+  {
+   "symbol": "NIDO",
+   "date": "2024-01-25",
+   "prev_close": 1008.8,
+   "close": 2590.0,
+   "change_pct": 1.5674068199841398
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2023-12-21",
+   "prev_close": 118.5,
+   "close": 303.5,
+   "change_pct": 1.5611814345991561
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2023-01-27",
+   "prev_close": 165.0,
+   "close": 420.0,
+   "change_pct": 1.5454545454545454
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2023-11-29",
+   "prev_close": 119.0,
+   "close": 300.75,
+   "change_pct": 1.5273109243697478
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2023-01-23",
+   "prev_close": 165.1,
+   "close": 416.0,
+   "change_pct": 1.5196850393700787
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2024-03-13",
+   "prev_close": 123.51,
+   "close": 307.01,
+   "change_pct": 1.4857096591369117
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2024-02-29",
+   "prev_close": 123.65,
+   "close": 306.46,
+   "change_pct": 1.478447230084917
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2024-04-01",
+   "prev_close": 126.25,
+   "close": 309.05,
+   "change_pct": 1.4479207920792079
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2024-05-03",
+   "prev_close": 126.0,
+   "close": 302.5,
+   "change_pct": 1.4007936507936507
+  },
+  {
+   "symbol": "NHIT",
+   "date": "2024-04-25",
+   "prev_close": 126.5,
+   "close": 302.65,
+   "change_pct": 1.3924901185770748
+  },
+  {
+   "symbol": "ATLASCYCLE",
+   "date": "2024-12-27",
+   "prev_close": 28.85,
+   "close": 66.15,
+   "change_pct": 1.2928942807625652
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2021-08-31",
+   "prev_close": 228.87,
+   "close": 524.0,
+   "change_pct": 1.2895093284397254
+  },
+  {
+   "symbol": "GVKPIL",
+   "date": "2022-08-12",
+   "prev_close": 2.5,
+   "close": 5.7,
+   "change_pct": 1.2800000000000002
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2022-12-07",
+   "prev_close": 161.1,
+   "close": 361.55,
+   "change_pct": 1.2442582247051521
+  },
+  {
+   "symbol": "SICAGEN",
+   "date": "2026-04-20",
+   "prev_close": 24.35,
+   "close": 54.55,
+   "change_pct": 1.2402464065708418
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2023-01-11",
+   "prev_close": 185.99,
+   "close": 409.0,
+   "change_pct": 1.199042959298887
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2021-03-25",
+   "prev_close": 350.0,
+   "close": 760.0,
+   "change_pct": 1.1714285714285713
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2022-12-01",
+   "prev_close": 185.05,
+   "close": 398.9,
+   "change_pct": 1.155633612537152
+  },
+  {
+   "symbol": "KOVAI",
+   "date": "2026-04-20",
+   "prev_close": 2576.65,
+   "close": 5487.9,
+   "change_pct": 1.1298585372479768
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2021-08-11",
+   "prev_close": 314.0,
+   "close": 652.8,
+   "change_pct": 1.0789808917197452
+  },
+  {
+   "symbol": "BINANIIND",
+   "date": "2023-02-23",
+   "prev_close": 5.55,
+   "close": 11.4,
+   "change_pct": 1.0540540540540544
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2022-06-17",
+   "prev_close": 140.01,
+   "close": 284.3,
+   "change_pct": 1.030569245053925
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2022-04-11",
+   "prev_close": 141.02,
+   "close": 286.0,
+   "change_pct": 1.0280811232449296
+  },
+  {
+   "symbol": "BCG",
+   "date": "2025-07-14",
+   "prev_close": 10.25,
+   "close": 20.71,
+   "change_pct": 1.0204878048780488
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-03-30",
+   "prev_close": 961.16,
+   "close": 1940.0,
+   "change_pct": 1.0183944400516043
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-11-13",
+   "prev_close": 1074.0,
+   "close": 2152.5,
+   "change_pct": 1.0041899441340782
+  },
+  {
+   "symbol": "ATNINTER",
+   "date": "2020-03-17",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "ATNINTER",
+   "date": "2020-03-30",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "BLUECHIP",
+   "date": "2020-04-03",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "BLUECHIP",
+   "date": "2020-09-14",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "BLUECHIP",
+   "date": "2020-09-17",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "GODHA-RE",
+   "date": "2023-06-02",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "KSERASERA",
+   "date": "2020-03-04",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "KSERASERA",
+   "date": "2020-03-17",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "KSERASERA",
+   "date": "2020-03-24",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "KSERASERA",
+   "date": "2020-03-27",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "KSERASERA",
+   "date": "2020-04-13",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "MVL",
+   "date": "2020-02-17",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "RAJRAYON",
+   "date": "2020-01-03",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "RAJRAYON",
+   "date": "2020-01-17",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "RAJRAYON",
+   "date": "2020-01-27",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "RAJRAYON",
+   "date": "2020-02-12",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "RAJRAYON",
+   "date": "2020-04-13",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "RAJRAYON",
+   "date": "2020-04-28",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "RAJRAYON",
+   "date": "2020-05-13",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "RAJRAYON",
+   "date": "2020-05-27",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "RAJRAYON",
+   "date": "2020-06-01",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "SRPL-RE",
+   "date": "2023-07-24",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "UVSL",
+   "date": "2020-02-04",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "UVSL",
+   "date": "2020-02-14",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "UVSL",
+   "date": "2020-02-24",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "UVSL",
+   "date": "2020-02-27",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "UVSL",
+   "date": "2020-03-03",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "UVSL",
+   "date": "2020-03-16",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "UVSL",
+   "date": "2020-03-18",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "UVSL",
+   "date": "2020-03-24",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "UVSL",
+   "date": "2020-03-26",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "UVSL",
+   "date": "2020-03-31",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "UVSL",
+   "date": "2020-04-03",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "UVSL",
+   "date": "2020-04-08",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "UVSL",
+   "date": "2020-04-16",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VCL-RE",
+   "date": "2023-08-11",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2020-01-02",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2020-01-10",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2020-01-17",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2020-01-21",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2020-01-24",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2020-01-30",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2020-02-03",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2020-02-07",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2020-02-13",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2020-02-18",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2020-02-26",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2020-02-28",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2021-03-01",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2021-04-26",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "VISESHINFO",
+   "date": "2021-05-24",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "WINSOME",
+   "date": "2020-04-07",
+   "prev_close": 0.05,
+   "close": 0.1,
+   "change_pct": 1.0
+  },
+  {
+   "symbol": "IREDA",
+   "date": "2021-10-06",
+   "prev_close": 1140.59,
+   "close": 2278.9,
+   "change_pct": 0.9980010345522934
+  },
+  {
+   "symbol": "HDFCMFGETF",
+   "date": "2021-02-17",
+   "prev_close": 4242.0,
+   "close": 41.8,
+   "change_pct": -0.9901461574728901
+  },
+  {
+   "symbol": "SETFGOLD",
+   "date": "2022-01-06",
+   "prev_close": 4259.95,
+   "close": 42.35,
+   "change_pct": -0.9900585687625442
+  },
+  {
+   "symbol": "LICMFGOLD",
+   "date": "2026-03-06",
+   "prev_close": 14401.8,
+   "close": 143.2,
+   "change_pct": -0.9900567984557486
+  },
+  {
+   "symbol": "GOLDSHARE",
+   "date": "2021-03-25",
+   "prev_close": 4041.8,
+   "close": 40.45,
+   "change_pct": -0.989992082735415
+  },
+  {
+   "symbol": "BSLGOLDETF",
+   "date": "2021-11-25",
+   "prev_close": 4348.65,
+   "close": 43.65,
+   "change_pct": -0.9899624021247974
+  },
+  {
+   "symbol": "IVZINGOLD",
+   "date": "2026-04-30",
+   "prev_close": 12782.95,
+   "close": 130.25,
+   "change_pct": -0.9898106462123375
+  },
+  {
+   "symbol": "AXISGOLD",
+   "date": "2020-07-23",
+   "prev_close": 4367.1,
+   "close": 52.35,
+   "change_pct": -0.9880126399670262
+  },
+  {
+   "symbol": "MAJESCO",
+   "date": "2020-12-23",
+   "prev_close": 985.65,
+   "close": 12.2,
+   "change_pct": -0.9876223811697864
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-04-07",
+   "prev_close": 990.0,
+   "close": 1960.0,
+   "change_pct": 0.9797979797979799
+  },
+  {
+   "symbol": "QGOLDHALF",
+   "date": "2021-12-16",
+   "prev_close": 2062.45,
+   "close": 41.75,
+   "change_pct": -0.979757085020243
+  },
+  {
+   "symbol": "INCREDFIN",
+   "date": "2024-01-16",
+   "prev_close": 543.8,
+   "close": 1075.0,
+   "change_pct": 0.9768297168076501
+  },
+  {
+   "symbol": "IRFC",
+   "date": "2021-01-29",
+   "prev_close": 1063.0,
+   "close": 24.8,
+   "change_pct": -0.9766698024459078
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-07-29",
+   "prev_close": 1045.01,
+   "close": 2055.0,
+   "change_pct": 0.9664883589630722
+  },
+  {
+   "symbol": "SARVESHWAR",
+   "date": "2023-09-15",
+   "prev_close": 145.15,
+   "close": 4.9,
+   "change_pct": -0.9662418188081295
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-01-27",
+   "prev_close": 984.2,
+   "close": 1935.0,
+   "change_pct": 0.9660638081690713
+  },
+  {
+   "symbol": "ISHAN",
+   "date": "2024-01-25",
+   "prev_close": 149.95,
+   "close": 5.25,
+   "change_pct": -0.9649883294431477
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-07-17",
+   "prev_close": 1042.26,
+   "close": 2048.0,
+   "change_pct": 0.9649607583520428
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-07-02",
+   "prev_close": 1038.0,
+   "close": 2038.0,
+   "change_pct": 0.9633911368015415
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2022-07-20",
+   "prev_close": 135.0,
+   "close": 265.0,
+   "change_pct": 0.962962962962963
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-05-29",
+   "prev_close": 1022.7,
+   "close": 2007.01,
+   "change_pct": 0.9624621101007138
+  },
+  {
+   "symbol": "IREDA",
+   "date": "2023-11-29",
+   "prev_close": 1398.6,
+   "close": 60.0,
+   "change_pct": -0.9570999570999571
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-02-06",
+   "prev_close": 997.11,
+   "close": 1950.13,
+   "change_pct": 0.9557822105886011
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-01-21",
+   "prev_close": 987.66,
+   "close": 1931.0,
+   "change_pct": 0.9551262580240165
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-08-07",
+   "prev_close": 1046.0,
+   "close": 2045.06,
+   "change_pct": 0.9551242829827915
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-02-13",
+   "prev_close": 1000.0,
+   "close": 1955.0,
+   "change_pct": 0.9550000000000001
+  },
+  {
+   "symbol": "VINNY",
+   "date": "2023-02-24",
+   "prev_close": 334.3,
+   "close": 15.25,
+   "change_pct": -0.9543822913550704
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-09-04",
+   "prev_close": 1050.0,
+   "close": 2051.0,
+   "change_pct": 0.9533333333333334
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-02-17",
+   "prev_close": 1000.01,
+   "close": 1953.0,
+   "change_pct": 0.952980470195298
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-11-02",
+   "prev_close": 1067.0,
+   "close": 2083.51,
+   "change_pct": 0.9526804123711343
+  },
+  {
+   "symbol": "KESORAMIND",
+   "date": "2025-03-10",
+   "prev_close": 204.72,
+   "close": 9.71,
+   "change_pct": -0.9525693630324346
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-02-25",
+   "prev_close": 1000.02,
+   "close": 1952.56,
+   "change_pct": 0.9525209495810083
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-04-15",
+   "prev_close": 1009.0,
+   "close": 1970.0,
+   "change_pct": 0.952428146679881
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-08-05",
+   "prev_close": 1050.0,
+   "close": 2050.0,
+   "change_pct": 0.9523809523809523
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-10-07",
+   "prev_close": 1060.81,
+   "close": 2071.0,
+   "change_pct": 0.9522817469669405
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-06-02",
+   "prev_close": 1025.01,
+   "close": 2000.03,
+   "change_pct": 0.9512297441000575
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-03-02",
+   "prev_close": 1000.02,
+   "close": 1950.0,
+   "change_pct": 0.9499610007799844
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-04-29",
+   "prev_close": 1018.0,
+   "close": 1984.7,
+   "change_pct": 0.9496070726915522
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-10-13",
+   "prev_close": 1064.5,
+   "close": 2075.11,
+   "change_pct": 0.9493752935650541
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-09-09",
+   "prev_close": 1062.0,
+   "close": 2069.85,
+   "change_pct": 0.9490112994350282
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-01-06",
+   "prev_close": 991.0,
+   "close": 1931.38,
+   "change_pct": 0.9489202825428862
+  },
+  {
+   "symbol": "CUPID",
+   "date": "2024-04-04",
+   "prev_close": 2343.3,
+   "close": 123.0,
+   "change_pct": -0.9475099219050057
+  },
+  {
+   "symbol": "VERTOZ",
+   "date": "2024-07-05",
+   "prev_close": 686.5,
+   "close": 36.05,
+   "change_pct": -0.9474872541879097
+  },
+  {
+   "symbol": "SBC",
+   "date": "2022-02-22",
+   "prev_close": 147.5,
+   "close": 7.75,
+   "change_pct": -0.9474576271186441
+  },
+  {
+   "symbol": "SUVEN",
+   "date": "2020-01-21",
+   "prev_close": 301.45,
+   "close": 15.95,
+   "change_pct": -0.9470890694974291
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-06-09",
+   "prev_close": 1035.2,
+   "close": 2015.0,
+   "change_pct": 0.9464837712519318
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-01-15",
+   "prev_close": 993.11,
+   "close": 1932.0,
+   "change_pct": 0.9454038324052723
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-09-11",
+   "prev_close": 1062.0,
+   "close": 2066.0,
+   "change_pct": 0.9453860640301319
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-08-31",
+   "prev_close": 1059.0,
+   "close": 2060.0,
+   "change_pct": 0.9452313503305005
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-06-30",
+   "prev_close": 1040.0,
+   "close": 2021.54,
+   "change_pct": 0.9437884615384615
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-09-29",
+   "prev_close": 1064.4,
+   "close": 2068.0,
+   "change_pct": 0.9428786170612551
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-07-09",
+   "prev_close": 1050.0,
+   "close": 2040.0,
+   "change_pct": 0.9428571428571428
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2023-03-17",
+   "prev_close": 123.42,
+   "close": 239.7,
+   "change_pct": 0.9421487603305785
+  },
+  {
+   "symbol": "GOLDSTAR",
+   "date": "2023-01-23",
+   "prev_close": 161.9,
+   "close": 9.45,
+   "change_pct": -0.9416306361951822
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-09-16",
+   "prev_close": 1060.54,
+   "close": 2057.03,
+   "change_pct": 0.9396062383314163
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-09-24",
+   "prev_close": 1060.0,
+   "close": 2055.56,
+   "change_pct": 0.9392075471698114
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-06-26",
+   "prev_close": 1043.0,
+   "close": 2022.0,
+   "change_pct": 0.9386385426653883
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-07-31",
+   "prev_close": 1053.95,
+   "close": 2042.0,
+   "change_pct": 0.9374733146733716
+  },
+  {
+   "symbol": "LAL",
+   "date": "2024-03-28",
+   "prev_close": 406.0,
+   "close": 26.75,
+   "change_pct": -0.9341133004926109
+  },
+  {
+   "symbol": "SREIBNPNCD",
+   "date": "2022-04-27",
+   "prev_close": 155.0,
+   "close": 299.58,
+   "change_pct": 0.9327741935483871
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-05-22",
+   "prev_close": 1040.0,
+   "close": 2010.0,
+   "change_pct": 0.9326923076923077
+  },
+  {
+   "symbol": "BESTAGRO",
+   "date": "2026-01-16",
+   "prev_close": 434.2,
+   "close": 29.65,
+   "change_pct": -0.9317134960847535
+  },
+  {
+   "symbol": "DANGEE",
+   "date": "2022-09-06",
+   "prev_close": 406.1,
+   "close": 27.95,
+   "change_pct": -0.9311745875400148
+  },
+  {
+   "symbol": "GLOBE",
+   "date": "2021-08-03",
+   "prev_close": 192.7,
+   "close": 13.45,
+   "change_pct": -0.9302023871302543
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-06-12",
+   "prev_close": 1045.8,
+   "close": 2017.25,
+   "change_pct": 0.9289061005928476
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-05-05",
+   "prev_close": 1034.9,
+   "close": 1995.0,
+   "change_pct": 0.9277224852642765
+  },
+  {
+   "symbol": "DELPHIFX",
+   "date": "2026-02-13",
+   "prev_close": 228.13,
+   "close": 16.7,
+   "change_pct": -0.926796125016438
+  },
+  {
+   "symbol": "EXCEL",
+   "date": "2022-09-28",
+   "prev_close": 8.8,
+   "close": 0.65,
+   "change_pct": -0.9261363636363636
+  },
+  {
+   "symbol": "LANCER",
+   "date": "2026-08-17",
+   "prev_close": 149.7,
+   "close": 11.07,
+   "change_pct": -0.9260521042084169
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-03-23",
+   "prev_close": 967.0,
+   "close": 1861.05,
+   "change_pct": 0.9245604963805585
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-04-21",
+   "prev_close": 1029.99,
+   "close": 1979.2,
+   "change_pct": 0.9215720540976127
+  },
+  {
+   "symbol": "HARDWYN",
+   "date": "2023-06-05",
+   "prev_close": 622.1,
+   "close": 51.1,
+   "change_pct": -0.9178588651342228
+  },
+  {
+   "symbol": "IIHFL",
+   "date": "2020-01-21",
+   "prev_close": 1018.66,
+   "close": 1950.0,
+   "change_pct": 0.9142795437142914
+  },
+  {
+   "symbol": "L&TINFRA",
+   "date": "2020-06-19",
+   "prev_close": 1033.0,
+   "close": 1976.0,
+   "change_pct": 0.9128751210067765
+  },
+  {
+   "symbol": "PAISALO",
+   "date": "2022-06-30",
+   "prev_close": 799.35,
+   "close": 72.2,
+   "change_pct": -0.9096766122474511
+  },
+  {
+   "symbol": "SAKSOFT",
+   "date": "2022-09-23",
+   "prev_close": 1332.85,
+   "close": 120.6,
+   "change_pct": -0.9095171999849946
+  },
+  {
+   "symbol": "PAVNAIND",
+   "date": "2025-09-01",
+   "prev_close": 413.2,
+   "close": 37.95,
+   "change_pct": -0.9081558567279767
+  },
+  {
+   "symbol": "KAMDHENU",
+   "date": "2025-01-08",
+   "prev_close": 479.3,
+   "close": 44.5,
+   "change_pct": -0.9071562695597747
+  },
+  {
+   "symbol": "SPORTKING",
+   "date": "2024-09-13",
+   "prev_close": 1572.55,
+   "close": 147.3,
+   "change_pct": -0.9063304823376045
+  },
+  {
+   "symbol": "AVROIND",
+   "date": "2026-05-05",
+   "prev_close": 127.1,
+   "close": 12.04,
+   "change_pct": -0.9052714398111723
+  },
+  {
+   "symbol": "GROWWSLVR",
+   "date": "2026-02-06",
+   "prev_close": 242.59,
+   "close": 23.03,
+   "change_pct": -0.9050661610124078
+  },
+  {
+   "symbol": "ROLEXRINGS",
+   "date": "2025-10-17",
+   "prev_close": 1327.0,
+   "close": 126.1,
+   "change_pct": -0.9049736247174077
+  },
+  {
+   "symbol": "ARTEMISMED",
+   "date": "2021-09-23",
+   "prev_close": 412.8,
+   "close": 39.25,
+   "change_pct": -0.9049176356589147
+  },
+  {
+   "symbol": "SECL",
+   "date": "2023-05-04",
+   "prev_close": 216.45,
+   "close": 20.6,
+   "change_pct": -0.9048279048279049
+  },
+  {
+   "symbol": "KOTYARK",
+   "date": "2026-06-24",
+   "prev_close": 453.8,
+   "close": 43.3,
+   "change_pct": -0.9045835169678272
+  },
+  {
+   "symbol": "IONEXCHANG",
+   "date": "2023-06-12",
+   "prev_close": 4322.5,
+   "close": 412.75,
+   "change_pct": -0.9045112781954887
+  },
+  {
+   "symbol": "TIPSINDLTD",
+   "date": "2023-04-21",
+   "prev_close": 1681.25,
+   "close": 161.35,
+   "change_pct": -0.9040297397769517
+  },
+  {
+   "symbol": "TTL",
+   "date": "2025-02-12",
+   "prev_close": 145.29,
+   "close": 14.01,
+   "change_pct": -0.903572166012802
+  },
+  {
+   "symbol": "SIGACHI",
+   "date": "2023-10-09",
+   "prev_close": 408.9,
+   "close": 39.5,
+   "change_pct": -0.9033993641477134
+  },
+  {
+   "symbol": "EXXARO",
+   "date": "2024-12-13",
+   "prev_close": 114.02,
+   "close": 11.04,
+   "change_pct": -0.9031748815997194
+  },
+  {
+   "symbol": "WEBELSOLAR",
+   "date": "2025-11-14",
+   "prev_close": 1352.8,
+   "close": 132.1,
+   "change_pct": -0.902350680070964
+  },
+  {
+   "symbol": "BTML",
+   "date": "2024-04-05",
+   "prev_close": 184.1,
+   "close": 18.0,
+   "change_pct": -0.9022270505160239
+  },
+  {
+   "symbol": "MITTAL",
+   "date": "2023-11-01",
+   "prev_close": 18.4,
+   "close": 1.8,
+   "change_pct": -0.9021739130434783
+  },
+  {
+   "symbol": "ABINFRA",
+   "date": "2025-10-17",
+   "prev_close": 196.86,
+   "close": 19.27,
+   "change_pct": -0.9021131768769685
+  },
+  {
+   "symbol": "WEL",
+   "date": "2024-11-12",
+   "prev_close": 1564.3,
+   "close": 153.25,
+   "change_pct": -0.9020328581474142
+  }
+ ]
 }

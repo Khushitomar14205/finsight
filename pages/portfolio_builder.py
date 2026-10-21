@@ -1,7 +1,10 @@
 import io
 import streamlit as st
 import pandas as pd
-from pages.common import get_context, demo_banner, require_data, picker_symbols
+from pages.common import get_context, demo_banner, require_data, picker_symbols, fmt_pct
+
+def _wtext(w):
+    return ", ".join(f"{k} {fmt_pct(v, signed=False)}" for k, v in w.items())
 from src.portfolio import engine as PE
 
 settings, store = get_context()
@@ -27,7 +30,7 @@ with tab1:
             w = PE.validate_weights(values) if mode == "Weights (%)" else PE.weights_from_amounts(values)
             st.session_state["portfolio_weights"] = w
             st.session_state["initial_value"] = initial
-            st.success(f"Active portfolio set: {w}")
+            st.success(f"Active portfolio set: {_wtext(w)}")
         except ValueError as e:
             st.error(str(e))
 
@@ -38,7 +41,7 @@ with tab2:
         try:
             w = PE.parse_holdings_csv(io.BytesIO(up.getvalue()))
             st.session_state["portfolio_weights"] = w
-            st.success(f"Imported: {w}")
+            st.success(f"Imported: {_wtext(w)}")
         except Exception as e:
             st.error(f"Invalid CSV: {e}")
     st.download_button("Download template CSV", "symbol,weight\nRELIANCE,40\nTCS,35\nINFY,25\n",
@@ -57,4 +60,4 @@ with tab3:
         for f in sorted(saved_dir.glob("*.json")):
             if st.button(f"Load {f.stem}"):
                 st.session_state["portfolio_weights"] = PE.load_portfolio(f)
-                st.success(f"Loaded {f.stem}: {st.session_state['portfolio_weights']}")
+                st.success(f"Loaded {f.stem}: {_wtext(st.session_state['portfolio_weights'])}")

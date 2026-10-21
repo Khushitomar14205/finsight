@@ -2,7 +2,8 @@ import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-from pages.common import get_context, demo_banner, require_data, picker_symbols, symbol_info
+from pages.common import (get_context, demo_banner, require_data, picker_symbols, symbol_info,
+                          fmt_pct, fmt_num, fmt_date, METRIC_HELP)
 from src.analytics import returns as R
 from src.portfolio.engine import price_wide
 
@@ -49,9 +50,29 @@ st.caption(f"Common comparison range for the table below: {comp.get('common_star
 
 rows = []
 for sym, s in comp["symbols"].items():
-    rows.append({"Symbol": sym, "Total return": s["total_return"], "Ann. return": s["annualized_return"],
-                 "Volatility": s["annualized_volatility"], "Sharpe": s["sharpe_ratio"], "Max drawdown": s["max_drawdown"]})
-st.dataframe(pd.DataFrame(rows), use_container_width=True)
+    rows.append({"Symbol": sym, "Total return": fmt_pct(s["total_return"]),
+                 "Ann. return (CAGR)": fmt_pct(s["annualized_return"]),
+                 "Volatility (ann.)": fmt_pct(s["annualized_volatility"]),
+                 "Sharpe": fmt_num(s["sharpe_ratio"]),
+                 "Max drawdown": fmt_pct(s["max_drawdown"])})
+st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+st.caption("All returns are price returns on unadjusted closes over the common period "
+           f"{fmt_date(comp.get('common_start'))} → {fmt_date(comp.get('common_end'))}. "
+           "Volatility = std of daily returns × √252; Sharpe uses the configured risk-free rate.")
+
+# --- Concise factual summary: best in class per metric ---
+stats = comp["symbols"]
+if len(stats) >= 2:
+    def best(key, higher=True):
+        items = [(k, v[key]) for k, v in stats.items() if v.get(key) is not None]
+        return (max if higher else min)(items, key=lambda kv: kv[1]) if items else (None, None)
+    b_ret, b_vol, b_shp, b_dd = best("total_return"), best("annualized_volatility", higher=False), \
+        best("sharpe_ratio"), best("max_drawdown")
+    st.info(f"**Summary:** {b_ret[0]} had the highest total return ({fmt_pct(b_ret[1])}); "
+            f"{b_vol[0]} was the least volatile ({fmt_pct(b_vol[1])} annualized); "
+            f"{b_shp[0]} had the best risk-adjusted return (Sharpe {fmt_num(b_shp[1])}); "
+            f"{b_dd[0]} had the shallowest maximum drawdown ({fmt_pct(b_dd[1])}). "
+            "Past performance does not predict future results.")
 
 # --- Normalized chart: each symbol over ITS OWN trading dates ---
 # (Forcing common dates here used to make rarely-traded instruments vanish.)
@@ -64,10 +85,13 @@ for sym in picked:
                                  mode="lines+markers" if len(sub) < 40 else "lines",
                                  marker=dict(size=4)))
 fig.update_layout(title="Normalized price performance (each symbol = 100 at its own first observation shown)",
-                  yaxis_title="Normalized price", hovermode="x unified")
+                  yaxis_title="Normalized price (base = 100)", hovermode="x unified")
 st.plotly_chart(fig, use_container_width=True)
-st.caption("Each line is normalized on the symbol's own available history, so rarely-traded instruments remain "
-           "visible. The table, cumulative returns, and correlation below still use the common overlapping range.")
+st.caption("**How to read this chart:** every symbol's price is rescaled so its first observation in view = **100**. "
+           "A line at 150 means the price is up 50% since that starting point; 80 means down 20%. This makes growth "
+           "comparable across stocks with very different price levels (₹50 vs ₹2,500). Each line is normalized on the "
+           "symbol's own available history (start dates are in the legend), so rarely-traded instruments remain "
+           "visible. The table, cumulative returns, and correlation below use the common overlapping range only.")
 
 # --- Common-range analytics, only when a real overlap exists ---
 wide = price_wide(df, picked)
@@ -80,6 +104,10 @@ if len(common) >= 5:
     corr = rets.corr()
     st.plotly_chart(px.imshow(corr, text_auto=".2f", title="Return correlation (common dates)",
                               color_continuous_scale="RdBu", zmin=-1, zmax=1), use_container_width=True)
+    st.caption(f"**Correlation** measures how daily returns move together, from **+1** (identical movement) through "
+               f"**0** (no relationship) to **−1** (opposite movement), computed on the {len(common)} common trading "
+               "days only. Lower correlation between holdings means their swings offset each other more — the basis "
+               "of diversification. Correlation is historical and can change over time.")
     st.plotly_chart(px.histogram(rets, barmode="overlay", opacity=0.6,
                                  title="Daily return distributions (common dates)"), use_container_width=True)
 else:
