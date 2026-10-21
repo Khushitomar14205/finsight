@@ -1,7 +1,7 @@
 import io
 import streamlit as st
 import pandas as pd
-from pages.common import get_context, demo_banner, require_data
+from pages.common import get_context, demo_banner, require_data, picker_symbols
 from src.portfolio import engine as PE
 
 settings, store = get_context()
@@ -10,7 +10,9 @@ demo_banner(settings)
 if not require_data(store):
     st.stop()
 
-symbols = store.available_symbols()
+equities_only = st.toggle("Equities only (EQ series)", value=True,
+                          help="Off = include NCDs/bonds and other bhavcopy instruments, which trade rarely.")
+symbols = picker_symbols(store, equities_only)
 tab1, tab2, tab3 = st.tabs(["Manual weights", "Import CSV", "Saved portfolios"])
 
 with tab1:

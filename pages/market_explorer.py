@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from pages.common import get_context, demo_banner, require_data
+from pages.common import get_context, demo_banner, require_data, picker_symbols, symbol_info
 from src.analytics import returns as R
 from src.reporting.report import dataframe_to_csv_bytes
 
@@ -11,8 +11,14 @@ demo_banner(settings)
 if not require_data(store):
     st.stop()
 
-symbols = store.available_symbols()
+equities_only = st.toggle("Equities only (EQ series)", value=True,
+                          help="Off = include NCDs/bonds and other bhavcopy instruments, which trade rarely.")
+symbols = picker_symbols(store, equities_only)
 symbol = st.selectbox("Symbol", symbols)
+_info = symbol_info(store, symbol)
+if _info.get("rows"):
+    st.caption(f"Series: {', '.join(_info.get('series', []))} · traded on {_info.get('coverage_pct', 0):.0%} of "
+               f"all trading days" + ("" if _info.get("is_equity") else " · ⚠️ non-equity instrument (e.g. NCD/bond)"))
 cov = store.coverage()
 c1, c2 = st.columns(2)
 start = c1.date_input("Start", value=pd.Timestamp(cov["date_min"]))

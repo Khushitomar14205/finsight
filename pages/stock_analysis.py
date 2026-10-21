@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
-from pages.common import get_context, demo_banner, require_data
+from pages.common import get_context, demo_banner, require_data, picker_symbols, symbol_info
 from src.analytics import returns as R
 from src.technical_indicators import indicators as TI
 
@@ -11,8 +11,14 @@ demo_banner(settings)
 if not require_data(store):
     st.stop()
 
-symbols = store.available_symbols()
+equities_only = st.toggle("Equities only (EQ series)", value=True,
+                          help="Off = include NCDs/bonds and other bhavcopy instruments, which trade rarely.")
+symbols = picker_symbols(store, equities_only)
 symbol = st.selectbox("Symbol", symbols)
+_info = symbol_info(store, symbol)
+if _info.get("rows") and not _info.get("is_equity"):
+    st.warning(f"**{symbol}** is a non-equity instrument (series: {', '.join(_info.get('series', []))}) that traded on "
+               f"only {_info.get('coverage_pct', 0):.0%} of trading days — indicator analysis may be unavailable or misleading.")
 df_all = store.load(symbols=[symbol])
 c1, c2 = st.columns(2)
 start = c1.date_input("Start", value=df_all["date"].min())
